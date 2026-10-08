@@ -48,6 +48,7 @@ public class PostService {
                 request.applicationUrl(),
                 request.eventAt(),
                 request.deadlineAt(),
+                request.displayUntil(),
                 showViewCount
         );
 
@@ -126,6 +127,7 @@ public class PostService {
                 post.getApplicationUrl(),
                 post.getEventAt(),
                 post.getDeadlineAt(),
+                post.getDisplayUntil(),
                 post.getStatus(),
                 post.isShowViewCount(),
                 post.getViewCount(),

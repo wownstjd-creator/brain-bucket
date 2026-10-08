@@ -32,5 +32,12 @@ build/
 ### VS Code ###
 .vscode/
 
-###
-/uploads/
+### Local uploaded images (root and backend) ###
+uploads/
+### Local secrets ###
+.env
+.env.*
+!.env.example
+**/application-local.properties
+**/application-local.yml
+**/application-local.yaml

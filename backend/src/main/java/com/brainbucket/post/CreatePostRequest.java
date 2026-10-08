@@ -1,7 +1,7 @@
 package com.brainbucket.post;
 
 import jakarta.validation.constraints.Size;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record CreatePostRequest(
@@ -27,7 +27,7 @@ public record CreatePostRequest(
         LocalDateTime eventAt,
 
         LocalDateTime deadlineAt,
-
+        LocalDate displayUntil,
         Boolean showViewCount
 
 ) {

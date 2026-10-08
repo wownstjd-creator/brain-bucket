@@ -2,8 +2,9 @@ package com.brainbucket.post;
 
 import com.brainbucket.user.User;
 import jakarta.persistence.*;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "posts")
@@ -62,7 +63,8 @@ public class Post {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
-
+    @Column(name = "display_until")
+    private LocalDate displayUntil;
     protected Post() {
     }
 
@@ -76,6 +78,7 @@ public class Post {
             String applicationUrl,
             LocalDateTime eventAt,
             LocalDateTime deadlineAt,
+            LocalDate displayUntil,
             boolean showViewCount
     ) {
         this.author = author;
@@ -87,6 +90,7 @@ public class Post {
         this.applicationUrl = applicationUrl;
         this.eventAt = eventAt;
         this.deadlineAt = deadlineAt;
+        this.displayUntil = displayUntil;
         this.showViewCount = showViewCount;
         this.status = PostStatus.DRAFT;
         this.viewCount = 0;
@@ -112,6 +116,7 @@ public class Post {
         this.applicationUrl = request.applicationUrl();
         this.eventAt = request.eventAt();
         this.deadlineAt = request.deadlineAt();
+        this.displayUntil = request.displayUntil();
         this.showViewCount = request.showViewCount() == null
                 || request.showViewCount();
         this.status = PostStatus.DRAFT;
@@ -134,5 +139,20 @@ public class Post {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public LocalDateTime getDeletedAt() { return deletedAt; }
+    public LocalDate getDisplayUntil() {
+        return displayUntil;
+    }
+    public void requestApproval() {
+        this.status = PostStatus.PENDING;
+    }
+    public void approve() {
+        this.status = PostStatus.APPROVED;
+        this.publishedAt = LocalDateTime.now(
+                ZoneId.of("Asia/Seoul")
+        );
+    }
 
+    public void reject() {
+        this.status = PostStatus.REJECTED;
+    }
 }

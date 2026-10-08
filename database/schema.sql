@@ -1,3 +1,5 @@
+-- Initial schema for an empty database only. Do not run on an existing database.
+-- Updated 2026-10-08: posts.display_until added. No user data included.
 -- MySQL dump 10.13  Distrib 8.0.46, for Win64 (x86_64)
 --
 -- Host: localhost    Database: brain_bucket
@@ -91,6 +93,7 @@ CREATE TABLE `posts` (
   `application_url` varchar(2048) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `event_at` datetime DEFAULT NULL,
   `deadline_at` datetime DEFAULT NULL,
+  `display_until` date DEFAULT NULL,
   `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'DRAFT',
   `show_view_count` tinyint(1) NOT NULL DEFAULT '1',
   `view_count` bigint NOT NULL DEFAULT '0',

@@ -42,7 +42,12 @@ public class SecurityConfig {
                                 "/api/auth/signup",
                                 "/api/auth/login"
                         ).permitAll()
-
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/posts/public",
+                                "/api/posts/public/{postId}",
+                                "/api/posts/public/{postId}/poster"
+                        ).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()

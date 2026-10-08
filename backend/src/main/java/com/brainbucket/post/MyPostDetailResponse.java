@@ -1,7 +1,7 @@
 package com.brainbucket.post;
 
 import java.time.LocalDateTime;
-
+import java.time.LocalDate;
 public record MyPostDetailResponse(
         Long id,
         String title,
@@ -12,6 +12,7 @@ public record MyPostDetailResponse(
         String applicationUrl,
         LocalDateTime eventAt,
         LocalDateTime deadlineAt,
+        LocalDate displayUntil,
         PostStatus status,
         boolean showViewCount,
         long viewCount,
