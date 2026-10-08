@@ -49,4 +49,19 @@ public class PosterController {
                 .cacheControl(CacheControl.noStore())
                 .body(poster.resource());
     }
+    @PutMapping(
+            value = "/{postId}/poster",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public UploadPosterResponse replace(
+            Authentication authentication,
+            @PathVariable Long postId,
+            @RequestParam("file") MultipartFile file
+    ) {
+        return posterService.replace(
+                authentication.getName(),
+                postId,
+                file
+        );
+    }
 }

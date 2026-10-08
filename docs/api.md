@@ -1,6 +1,6 @@
 # Brain Bucket API 연결 안내
 
-기준: 2026-10-08 최신 post·config 소스와 제공된 user 소스·실행 설정. 승인·반려·공개 조회·아카이브까지 개발자 로컬에서 동작 확인했다. 프론트 연결 테스트는 별도이며 이 문서 작성 시 최신 저장소를 직접 빌드하지 않았다. 예시 ID·시각·크기는 설명용이다. 실행 및 DB 준비는 [README](../README.md)를 참고한다.
+기준: 2026-10-08 최신 post·config 소스와 제공된 user 소스·실행 설정. 승인·반려·공개 조회·아카이브·관리자 심사용 조회·포스터 교체까지 개발자 로컬에서 동작 확인했다. 프론트 연결 테스트는 별도이며 이 문서 작성 시 최신 저장소를 직접 빌드하지 않았다. 예시 ID·시각·크기는 설명용이다. 실행 및 DB 준비는 [README](../README.md)를 참고한다.
 
 ## 실행 환경
 
@@ -44,16 +44,20 @@ IntelliJ 실행 시에도 Run Configuration의 환경변수에 두 값을 지정
 | GET | `/api/posts/mine/{postId}` | 작성자 | 200 |
 | PUT | `/api/posts/mine/{postId}` | 작성자, CSRF 필요 | 200 |
 | POST | `/api/posts/mine/{postId}/poster` | 작성자, CSRF 필요 | 201 |
+| PUT | `/api/posts/mine/{postId}/poster` | 작성자, CSRF 필요 | 200 |
 | GET | `/api/posts/mine/{postId}/poster` | 작성자 | 200, 이미지 |
 | POST | `/api/posts/mine/{postId}/approval-request` | 작성자, CSRF | 200 |
 | GET | `/api/posts/mine/{postId}/approval-logs` | 작성자 | 200 |
+| GET | `/api/admin/posts?page=0&size=20` | ADMIN | 200 |
+| GET | `/api/admin/posts/{postId}` | ADMIN | 200 |
+| GET | `/api/admin/posts/{postId}/poster` | ADMIN | 200, 이미지 |
 | POST | `/api/admin/posts/{postId}/approve` | ADMIN, CSRF | 200 |
 | POST | `/api/admin/posts/{postId}/reject` | ADMIN, CSRF | 200 |
 | GET | `/api/posts/public?archived=false&page=0&size=20` | 비로그인 가능 | 200 |
 | GET | `/api/posts/public/{postId}` | 비로그인 가능 | 200 |
 | GET | `/api/posts/public/{postId}/poster` | 비로그인 가능 | 200, 이미지 |
 
-`/api/admin/**`는 ADMIN 권한 제한이 적용된다. 승인·반려 API는 구현되었고 검토 목록·상세·이미지 API는 아직 없다.
+`/api/admin/**`는 ADMIN 권한 제한이 적용된다. 검토 대기 목록·상세·포스터 조회 및 승인·반려 API를 제공한다.
 
 ## 회원 API
 
@@ -61,7 +65,10 @@ IntelliJ 실행 시에도 Run Configuration의 환경변수에 두 값을 지정
 
 GET `/api/auth/csrf`, 응답 예시:
 ```json
-{"headerName":"X-CSRF-TOKEN","token":"발급된_토큰"}
+{
+  "headerName": "X-CSRF-TOKEN",
+  "token": "발급된_토큰"
+}
 ```
 헤더 이름은 고정 문자열보다 응답의 `headerName`을 사용한다.
 
@@ -167,7 +174,7 @@ GET `/api/posts/mine?page=0&size=20`:
     "category": "CLUB",
     "status": "DRAFT",
     "deadlineAt": "2026-10-18T23:59:00",
-  "displayUntil": "2026-11-30",
+    "displayUntil": "2026-11-30",
     "createdAt": "2026-10-08T13:00:00"
   }
 ]
@@ -206,7 +213,7 @@ PUT `/api/posts/mine/{postId}`: 생성과 동일한 요청 JSON, 200 응답은 �
 
 ## 이미지
 
-POST `/api/posts/mine/{postId}/poster`, multipart/form-data의 `file`에 JPG·PNG를 첨부한다. 작성자·DRAFT/REJECTED 상태만 허용한다. 현재 이미 등록된 POSTER가 있으면 409이며 교체 API는 없다.
+POST `/api/posts/mine/{postId}/poster`, multipart/form-data의 `file`에 JPG·PNG를 첨부한다. 작성자·DRAFT/REJECTED 상태만 허용한다. 이미 등록된 POSTER가 있으면 409다. 최초 등록은 POST, 기존 이미지 교체는 아래 PUT API를 사용한다.
 
 실제 이미지 형식 검사, 10MB 이하, 가로/세로 각각 10,000px 이하·총 2천만 픽셀 이하. 서버에서 다시 인코딩하여 UUID 이름으로 저장한다. 원래 파일명은 DB에 저장하며 한글 이름을 금지하는 코드가 없다. 한글 이름의 실제 브라우저 업로드는 추가 검증 대상이다. 원본 회전 메타데이터 보존은 구현되지 않았다.
 
@@ -238,6 +245,29 @@ const result = await response.json();
 ```
 Content-Type은 직접 지정하지 않는다. 브라우저가 boundary를 설정한다. imageUrl은 상대 경로이므로 다른 origin의 프론트에서는 API 기준 주소와 합쳐야 한다. 보호된 이미지는 로그인 쿠키를 전달하는 요청으로 불러온다.
 
+### 기존 포스터 교체
+
+PUT `/api/posts/mine/{postId}/poster` — 작성자 세션·CSRF 필요. multipart/form-data의 `file` 필드에 새 이미지를 첨부한다. Content-Type은 브라우저에서 직접 지정하지 않는다.
+
+- 본인의 DRAFT·REJECTED 게시물만 가능하다. 그 외 상태는 409다.
+- 기존 포스터 기록이 있어야 한다. 기록이 없거나 본인 게시물이 아니면 404다.
+- 최초 업로드와 동일하게 JPG/PNG, 10MB 이하, 가로·세로 각각 10,000픽셀 이하, 전체 2천만 픽셀 이하로 검증한다.
+- 성공은 200이며 위 최초 업로드 응답과 동일한 구조다. 파일 ID와 게시물 상태는 유지된다.
+- REJECTED 상태에서 교체해도 REJECTED를 유지하며 승인 요청 API로 재신청한다.
+- 새 파일을 저장하고 DB 변경이 커밋된 뒤 기존 파일을 정리한다. DB 롤백 시 새 파일을 정리하고 기존 이미지 정보를 유지한다.
+- 파일 정리 실패는 로그에 기록하며, 트랜잭션 결과가 불확실하면 파일을 유지한다.
+- 이미지 교체와 승인 요청은 같은 게시물 행 잠금을 사용한다.
+
+```javascript
+const replacement = new FormData();
+replacement.append("file", selectedFile);
+await api(`/api/posts/mine/${postId}/poster`, {
+  method: "PUT", form: replacement
+});
+```
+
+위 예제의 api 함수는 아래 프론트 연결 예제를 사용한다. 검증 실패는 400, 인증 필요는 401, CSRF 검증 실패는 403, 파일 저장 실패는 500이다. 서버 multipart 한도 초과 응답은 실제 연동 시 확인한다.
+
 ## 오류 처리
 
 | 코드 | 주요 상황 |
@@ -266,10 +296,14 @@ POST `/api/posts/mine/{postId}/approval-request` — 작성자 세션·CSRF 필�
 
 200 응답:
 ```json
-{"id":6,"title":"Rejection test","status":"PENDING"}
+{
+  "id": 6,
+  "title": "Rejection test",
+  "status": "PENDING"
+}
 ```
 
-승인 증빙 필수 검사는 아직 없다. PENDING 게시물의 본문 수정·이미지 업로드는 현재 409다.
+승인 증빙 필수 검사는 아직 없다. PENDING 게시물의 본문 수정·이미지 업로드·교체는 409다.
 
 ### 승인·반려 이력
 
@@ -279,10 +313,10 @@ GET `/api/posts/mine/{postId}/approval-logs` — 작성자만, CSRF 불필요.
 ```json
 [
   {
-    "id":2,
-    "decision":"REJECTED",
-    "reason":"장소를 N111로 수정해주세요.",
-    "createdAt":"2026-10-08T14:16:00"
+    "id": 2,
+    "decision": "REJECTED",
+    "reason": "장소를 N111로 수정해주세요.",
+    "createdAt": "2026-10-08T14:16:00"
   }
 ]
 ```
@@ -298,23 +332,98 @@ POST `/api/admin/posts/{postId}/approve` — ADMIN·CSRF, 요청 본문 없음.
 PENDING만 처리한다. 종료일 누락/경과 및 POSTER 첨부 없음은 409, 실제 파일 없음은 404. 성공 시 APPROVED로 변경하고 publishedAt을 한국 시각으로 기록하며 approval_logs에 APPROVED 이력을 저장한다.
 
 ```json
-{"id":2,"title":"Updated club recruitment","status":"APPROVED"}
+{
+  "id": 2,
+  "title": "Updated club recruitment",
+  "status": "APPROVED"
+}
 ```
 
 ### 반려
 
 POST `/api/admin/posts/{postId}/reject` — ADMIN·CSRF, application/json:
 ```json
-{"reason":"장소를 N111로 수정해주세요."}
+{
+  "reason": "장소를 N111로 수정해주세요."
+}
 ```
 
 사유는 공백 불가·최대 2000자. 저장 시 양끝 공백 제거. PENDING만 처리하며 성공 상태는 REJECTED다. 상태 변경과 이력 저장은 하나의 트랜잭션이며 담당자 처리 시 게시물 행 잠금으로 중복 처리를 방지한다.
 
 ```json
-{"id":6,"title":"Rejection test","status":"REJECTED"}
+{
+  "id": 6,
+  "title": "Rejection test",
+  "status": "REJECTED"
+}
 ```
 
-이미 처리된 게시물은 409. 일반 회원의 담당자 API 접근은 403. 승인 대기 목록·담당자 상세·담당자 이미지 조회는 아직 제공하지 않는다. 작성자 이미지 API를 담당자용으로 대신 사용하면 안 된다.
+이미 처리된 게시물은 409. 일반 회원의 담당자 API 접근은 403. 담당자는 아래 관리자 조회 API를 사용한다. 작성자 이미지 API를 담당자용으로 대신 사용하면 안 된다.
+
+### 심사 대기 목록
+
+GET `/api/admin/posts?page=0&size=20` — ADMIN 세션 필요, CSRF 불필요.
+
+- 삭제되지 않은 PENDING 게시물만 반환한다.
+- page 기본 0·0 이상, size 기본 20·1~50. 범위 위반은 400이다.
+- createdAt 오름차순 후 id 오름차순이다. 승인 요청 시각이 아닌 게시물 작성 시각을 기준으로 정렬한다.
+- 배열을 반환하고 빈 결과는 `[]`다. totalElements·totalPages·hasNext는 없다.
+- Cache-Control: no-store.
+
+```json
+[
+  {
+    "id": 10,
+    "authorId": 1,
+    "title": "동아리 모집",
+    "organizer": "COMA",
+    "category": "CLUB",
+    "status": "PENDING",
+    "displayUntil": "2026-11-30",
+    "createdAt": "2026-10-08T15:00:00",
+    "updatedAt": "2026-10-08T15:05:00"
+  }
+]
+```
+
+### 담당자 상세
+
+GET `/api/admin/posts/{postId}` — ADMIN 세션 필요, CSRF 불필요.
+
+삭제되지 않은 게시물은 상태와 관계없이 조회할 수 있다. 없거나 삭제된 게시물은 404다. Cache-Control: no-store.
+
+```json
+{
+  "authorId": 1,
+  "post": {
+    "id": 10,
+    "title": "동아리 모집",
+    "organizer": "COMA",
+    "category": "CLUB",
+    "description": "모집 안내",
+    "location": "N111",
+    "applicationUrl": null,
+    "eventAt": null,
+    "deadlineAt": null,
+    "displayUntil": "2026-11-30",
+    "status": "PENDING",
+    "showViewCount": false,
+    "viewCount": 0,
+    "publishedAt": null,
+    "createdAt": "2026-10-08T15:00:00",
+    "updatedAt": "2026-10-08T15:05:00"
+  },
+  "imageUrl": "/api/admin/posts/10/poster"
+}
+```
+
+게시물 내용은 `post` 객체 안에 있다. 포스터 DB 기록이 없으면 imageUrl은 null이다. 기록이 있어도 실제 파일이 없으면 이미지 조회는 404다.
+
+### 담당자 포스터
+
+GET `/api/admin/posts/{postId}/poster` — ADMIN 세션 필요, CSRF 불필요.
+
+삭제되지 않은 게시물의 포스터를 상태와 관계없이 조회한다. 성공 시 image/png 또는 image/jpeg 바이너리, Cache-Control: no-store. 게시물·포스터 기록·실제 파일이 없으면 404다. 공개 이미지 URL과 달리 관리자 로그인 쿠키가 필요하다.
 
 ### 로컬 담당자 계정 준비
 
@@ -345,12 +454,12 @@ GET `/api/posts/public?archived=false&page=0&size=20`.
 ```json
 [
   {
-    "id":2,
-    "title":"Updated club recruitment",
-    "organizer":"COMA",
-    "category":"CLUB",
-    "displayUntil":"2026-11-30",
-    "imageUrl":"/api/posts/public/2/poster"
+    "id": 2,
+    "title": "Updated club recruitment",
+    "organizer": "COMA",
+    "category": "CLUB",
+    "displayUntil": "2026-11-30",
+    "imageUrl": "/api/posts/public/2/poster"
   }
 ]
 ```
@@ -362,19 +471,19 @@ GET `/api/posts/public?archived=false&page=0&size=20`.
 GET `/api/posts/public/{postId}`:
 ```json
 {
-  "id":2,
-  "title":"Updated club recruitment",
-  "organizer":"COMA",
-  "category":"CLUB",
-  "description":"Recruitment details updated.",
-  "location":"N111",
-  "applicationUrl":null,
-  "eventAt":null,
-  "deadlineAt":"2026-11-01T18:00:00",
-  "displayUntil":"2026-11-30",
-  "publishedAt":"2026-10-08T14:11:19",
-  "archived":false,
-  "imageUrl":"/api/posts/public/2/poster"
+  "id": 2,
+  "title": "Updated club recruitment",
+  "organizer": "COMA",
+  "category": "CLUB",
+  "description": "Recruitment details updated.",
+  "location": "N111",
+  "applicationUrl": null,
+  "eventAt": null,
+  "deadlineAt": "2026-11-01T18:00:00",
+  "displayUntil": "2026-11-30",
+  "publishedAt": "2026-10-08T14:11:19",
+  "archived": false,
+  "imageUrl": "/api/posts/public/2/poster"
 }
 ```
 
@@ -454,9 +563,18 @@ async function login(email, password) {
 
 - 새 로컬 DB에는 계정·전단·이미지가 없다. 직접 가입·등록·승인해야 공개 목록이 생긴다.
 - 서버 재시작 후 로그인/CSRF를 다시 준비한다.
-- PENDING 또는 APPROVED에서 PUT/이미지 업로드는 409. 이미지 교체는 미구현이다.
+- PENDING 또는 APPROVED에서 본문 수정·이미지 업로드·교체는 409. DRAFT·REJECTED는 이미지 교체가 가능하다.
 - 기존 API를 쓰는 화면은 그대로 진행하며 새 기능 연결이 필요할 때 최신 main을 반영한다.
 - UTF-8 응답을 Windows PowerShell이 잘못 해석하면 한글이 깨져 보일 수 있다. 로컬 반려 사유는 UTF-8 직접 읽기로 정상 확인했다. 브라우저의 실제 한글 업로드·입력도 함께 확인한다.
 - 승인 증빙·스냅샷은 아직 없어 현재 승인 기능이 전체 승인 업무를 완성한 상태는 아니다.
-- CORS, 담당자 조회, 이미지 교체, 승인 후 수정, 검색/분류/연도, 스크랩, 조회수는 남은 작업이다.
+- CORS, 승인 후 수정, 검색/분류/연도, 스크랩, 조회수는 남은 작업이다. 학교장 직인 관련 절차는 오프라인 협의 후 결정한다.
 - API 변경은 적용 전 공유하며 DB 변경 SQL과 문서를 함께 갱신한다.
+
+## 이번 추가 기능의 로컬 검증
+
+- 관리자 목록·상세·포스터 조회 성공.
+- 일반 계정의 관리자 GET API 3개 접근 시 403 확인.
+- DRAFT 게시물의 최초 이미지 업로드 및 교체 성공.
+- 이미지가 아닌 파일로 교체 시 400 및 전후 이미지 해시 동일 확인.
+- PENDING 게시물의 이미지 교체 시 409 확인.
+- 이번 추가 기능은 DB 구조 변경이 없다. 동시 요청·DB 롤백·파일 정리 실패 상황은 별도 실험하지 않았다.

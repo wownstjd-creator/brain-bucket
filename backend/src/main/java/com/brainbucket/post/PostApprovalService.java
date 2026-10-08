@@ -43,8 +43,10 @@ public class PostApprovalService {
                         new ResponseStatusException(HttpStatus.UNAUTHORIZED)
                 );
 
-        Post post = postRepository
-                .findByIdAndAuthor_IdAndDeletedAtIsNull(postId, author.getId())
+        Post post = postRepository.findForReview(postId)
+                .filter(value ->
+                        value.getAuthor().getId().equals(author.getId())
+                )
                 .orElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND)
                 );
