@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { boardRepository } from './data/boardRepository';
 import { categories, type BoardPost } from './types';
+import Upload from './capture/PosterCapture';
+import AccountPanel from './capture/AccountPanel';
+import './capture/capture.css';
 
 const statusText = { DRAFT: '작성 중', PENDING: '승인 대기', APPROVED: '게시 중', REJECTED: '반려', HIDDEN: '비공개' };
 const dateText = (value?: string) => value ? value.slice(0, 10).replaceAll('-', '.') : '미정';
@@ -42,59 +45,9 @@ function PostDetail({ post, back }: { post: BoardPost; back: string }) {
   </main>;
 }
 
-function Upload({ editPost }: { editPost?: BoardPost }) {
-  const [title, setTitle] = useState(editPost?.title || '');
-  const [organizer, setOrganizer] = useState(editPost?.organizer || '');
-  const [category, setCategory] = useState<string>(editPost?.category || '동아리');
-  const [description, setDescription] = useState(editPost?.description || '');
-  const [location, setLocation] = useState(editPost?.location || '');
-  const [eventAt, setEventAt] = useState(editPost?.eventAt?.slice(0, 16) || '');
-  const [deadlineAt, setDeadlineAt] = useState(editPost?.deadlineAt?.slice(0, 16) || '');
-  const [postingEndsAt, setPostingEndsAt] = useState(editPost?.postingEndsAt?.slice(0, 10) || '');
-  const [imageUrl, setImageUrl] = useState(editPost?.imageUrl || '');
-  const [fileError, setFileError] = useState('');
-  const [preview, setPreview] = useState(false);
-  useEffect(() => () => { if (imageUrl.startsWith('blob:')) URL.revokeObjectURL(imageUrl); }, [imageUrl]);
-  return <main className="form-page"><div className="page-intro"><span className="eyebrow">우리 학교 게시판</span><h1>{editPost ? '대자보 수정하기' : '대자보 올리기'}</h1><p>전단 한 장으로, 더 많은 사람에게.</p></div>
-    <div className="inline-note">지금은 화면 체험이에요. 로그인과 서버 저장은 추후 연결합니다.</div>
-    <form onSubmit={event => { event.preventDefault(); setPreview(true); }}>
-      <label className="upload-box"><input type="file" accept="image/png,image/jpeg,image/webp" aria-label="대자보 이미지 선택" onChange={event => {
-        const file = event.target.files?.[0]; if (!file) return;
-        if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 10 * 1024 * 1024) { setFileError('JPG, PNG, WebP 이미지 중 10MB 이하를 선택해주세요.'); event.target.value = ''; return; }
-        setFileError(''); setImageUrl(URL.createObjectURL(file));
-      }}/>{imageUrl ? <><img src={imageUrl} alt="선택한 전단 미리보기"/><span className="replace-image">이미지 바꾸기</span></> : <><Icon name="image"/><strong>대자보 이미지를 선택해주세요</strong><span>JPG · PNG · WebP / 미리보기 최대 10MB</span></>}</label>
-      {fileError && <p role="alert" className="error">{fileError}</p>}
-      <div className="field"><label htmlFor="title">제목 <span>필수</span></label><input id="title" required maxLength={150} placeholder="어떤 소식인가요?" value={title} onChange={e => setTitle(e.target.value)}/></div>
-      <div className="field"><label htmlFor="organizer">주최자 <span>필수</span></label><input id="organizer" required maxLength={100} placeholder="동아리 또는 주최 단체 이름" value={organizer} onChange={e => setOrganizer(e.target.value)}/></div>
-      <div className="field"><label htmlFor="category">분류</label><select id="category" value={category} onChange={e => setCategory(e.target.value)}>{categories.map(item => <option key={item}>{item}</option>)}</select></div>
-      <div className="field"><label htmlFor="description">상세 설명</label><textarea id="description" rows={4} maxLength={10000} placeholder="전단에 담지 못한 내용을 알려주세요." value={description} onChange={e => setDescription(e.target.value)}/></div>
-      <div className="field"><label htmlFor="location">장소</label><input id="location" maxLength={150} placeholder="예: 학생회관 2층" value={location} onChange={e => setLocation(e.target.value)}/></div>
-      <div className="field"><label htmlFor="eventAt">행사 일시</label><input id="eventAt" type="datetime-local" value={eventAt} onChange={e => setEventAt(e.target.value)}/></div>
-      <div className="field"><label htmlFor="deadlineAt">신청 마감일</label><input id="deadlineAt" type="datetime-local" value={deadlineAt} onChange={e => setDeadlineAt(e.target.value)}/></div>
-      <div className="field"><label htmlFor="postingEndsAt">게시 종료일 <span>필수</span></label><input id="postingEndsAt" type="date" required value={postingEndsAt} onChange={e => setPostingEndsAt(e.target.value)}/><small>신청 마감일과 별개로 전단을 게시할 마지막 날짜예요.</small></div>
-      <section className="approval-note"><strong>담당자 승인 후 게시돼요</strong><p>승인 증빙 제출 방식은 협의 중입니다. 확정 후 이 화면에 연결할 예정이에요.</p></section>
-      <button className="primary full" type="submit">작성 내용 미리보기</button>
-      <div className="pending-actions"><button type="button" className="secondary" disabled>임시 저장 · 연결 예정</button><button type="button" className="secondary" disabled>승인 요청 · 연결 예정</button></div>
-      <p className="demo-note">입력 내용은 서버에 저장되지 않으며, 화면을 떠나면 사라집니다.<br/>필수 항목과 업로드 제한은 화면 초안 기준입니다.</p>
-    </form>
-    {preview && <Sheet title="작성 내용 미리보기" onClose={() => setPreview(false)}><div className="preview-content">{imageUrl ? <img src={imageUrl} alt="작성한 전단 미리보기"/> : <div className="empty-image">전단 이미지가 아직 없어요</div>}<span className="tag">{category}</span><h2>{title}</h2><p>{organizer}</p><p className="description">{description || '추가 설명 없음'}</p><dl><div><dt>장소</dt><dd>{location || '미정'}</dd></div><div><dt>행사 날짜</dt><dd>{dateText(eventAt)}</dd></div><div><dt>신청 마감</dt><dd>{dateText(deadlineAt)}</dd></div><div><dt>게시 종료</dt><dd>{dateText(postingEndsAt)}</dd></div></dl><p className="demo-note">미리보기입니다. 저장·승인 요청은 전송되지 않았어요.</p></div></Sheet>}
-  </main>;
-}
-
 function Login() {
-  const [signup, setSignup] = useState(false);
-  const [notice, setNotice] = useState(false);
-  return <main className="form-page auth-page"><div className="page-intro"><span className="eyebrow">한눈에</span><h1>{signup ? '회원가입' : '로그인'}</h1><p>대자보를 올릴 때만 로그인이 필요해요.</p></div><div className="inline-note">화면 시안입니다. 실제 계정 정보는 입력하지 않아도 돼요.</div>
-    <form onSubmit={e => { e.preventDefault(); setNotice(true); }}>
-      {signup && <div className="field"><label htmlFor="displayName">닉네임</label><input id="displayName" autoComplete="nickname" required maxLength={50}/></div>}
-      <div className="field"><label htmlFor="email">이메일</label><input id="email" type="email" autoComplete="email" required placeholder="example@school.ac.kr"/></div>
-      <div className="field"><label htmlFor="password">비밀번호</label><input id="password" type="password" autoComplete={signup ? 'new-password' : 'current-password'} minLength={signup ? 8 : undefined} maxLength={72} required/></div>
-      <button className="primary full">{signup ? '회원가입' : '로그인'} · 화면 확인</button>
-      {notice && <p role="status" className="inline-note">인증 API는 아직 연결하지 않았어요. 로그인 또는 회원가입이 처리되지 않았습니다.</p>}
-    </form><button className="text-button full" onClick={() => { setSignup(!signup); setNotice(false); }}>{signup ? '이미 계정이 있나요? 로그인' : '처음인가요? 회원가입'}</button><button className="secondary full" onClick={() => go('/board')}>로그인 없이 대자보 보기</button>
-  </main>;
+  return <main className="form-page auth-page"><div className="page-intro"><h1>내 계정</h1><p>백엔드를 실행한 상태에서 로그인·회원가입할 수 있어요.</p></div><AccountPanel/><a className="secondary full" href="#/board">로그인 없이 대자보 보기</a></main>;
 }
-
 export default function App() {
   const [route, setRoute] = useState(window.location.hash.slice(1) || '/board');
   const [category, setCategory] = useState('전체');
@@ -116,7 +69,7 @@ export default function App() {
   const filtered = boardRepository.list(archive).filter(item => (category === '전체' || item.category === category) && (!archive || year === '전체' || item.archiveYear === year) && `${item.title} ${item.organizer} ${item.description} ${item.category}`.toLowerCase().includes(query.trim().toLowerCase()));
   const back = post?.archiveYear ? '/archive' : post?.id.startsWith('my-') || route.startsWith('/edit/') ? '/mine' : '/board';
   const title = archive ? '지난 전단' : mine ? '내 대자보' : route === '/upload' ? '올리기' : route.startsWith('/edit/') ? '수정하기' : route === '/login' ? '내 계정' : '대자보';
-  return <div className="app-shell"><a className="skip-link" href="#content" onClick={e => { e.preventDefault(); mainRef.current?.focus(); }}>본문으로 이동</a>
+  return <div className={`app-shell ${route === '/upload' || editPost ? 'capture-shell' : ''}`}><a className="skip-link" href="#content" onClick={e => { e.preventDefault(); mainRef.current?.focus(); }}>본문으로 이동</a>
     <header className="app-header">{wall ? <a className="logo" href="#/board"><span className="brand-dot"/>한눈에</a> : <div className="header-title"><button onClick={() => go(back)} aria-label="목록으로 돌아가기"><Icon name="back"/></button><span>{post ? '대자보' : title}</span></div>}
       <div className="header-actions">{wall && <><button className="filter-button" onClick={() => setSheet('filter')} aria-label={`분류 선택: ${category}`}>{category}<span>⌄</span></button><button aria-label="대자보 검색" aria-expanded={searchOpen} onClick={() => setSearchOpen(!searchOpen)}><Icon name={searchOpen ? 'close' : 'search'}/></button></>}<button aria-label="내 계정 메뉴" onClick={() => setSheet('account')}><Icon name="user"/></button></div>
     </header>
