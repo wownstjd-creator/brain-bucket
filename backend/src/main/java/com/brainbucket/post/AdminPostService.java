@@ -2,142 +2,121 @@ package com.brainbucket.post;
 
 import com.brainbucket.user.User;
 import com.brainbucket.user.UserRepository;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-
 @Service
 public class AdminPostService {
 
-    private final UserRepository userRepository;
-    private final PostRepository postRepository;
-    private final ApprovalLogRepository approvalLogRepository;
-    private final PostFileRepository postFileRepository;
-    private final PosterStorage posterStorage;
+  private final UserRepository userRepository;
+  private final PostRepository postRepository;
+  private final ApprovalLogRepository approvalLogRepository;
+  private final PostFileRepository postFileRepository;
+  private final PosterStorage posterStorage;
 
-    public AdminPostService(
-            UserRepository userRepository,
-            PostRepository postRepository,
-            ApprovalLogRepository approvalLogRepository,
-            PostFileRepository postFileRepository,
-            PosterStorage posterStorage
-    ) {
-        this.userRepository = userRepository;
-        this.postRepository = postRepository;
-        this.approvalLogRepository = approvalLogRepository;
-        this.postFileRepository = postFileRepository;
-        this.posterStorage = posterStorage;
+  public AdminPostService(
+      UserRepository userRepository,
+      PostRepository postRepository,
+      ApprovalLogRepository approvalLogRepository,
+      PostFileRepository postFileRepository,
+      PosterStorage posterStorage) {
+    this.userRepository = userRepository;
+    this.postRepository = postRepository;
+    this.approvalLogRepository = approvalLogRepository;
+    this.postFileRepository = postFileRepository;
+    this.posterStorage = posterStorage;
+  }
+
+  @Transactional
+  public CreatePostResponse approve(String email, Long postId) {
+    User reviewer = requireAdmin(email);
+    Post post = requirePendingPost(postId);
+
+    LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+
+    if (post.getDisplayUntil() == null || post.getDisplayUntil().isBefore(today)) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "게시 종료일이 없거나 이미 지나 승인할 수 없습니다.");
     }
 
-    @Transactional
-    public CreatePostResponse approve(String email, Long postId) {
-        User reviewer = requireAdmin(email);
-        Post post = requirePendingPost(postId);
+    PostFile poster =
+        postFileRepository
+            .findByPost_IdAndFileKind(postId, "POSTER")
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "전단지 이미지가 없습니다."));
 
-        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+    posterStorage.loadStored(poster.getStorageKey());
 
-        if (post.getDisplayUntil() == null
-                || post.getDisplayUntil().isBefore(today)) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "게시 종료일이 없거나 이미 지나 승인할 수 없습니다."
-            );
-        }
+    PostRules.window(post.getDisplayFrom(), post.getDisplayUntil());
+    var evidence =
+        postFileRepository
+            .findByPost_IdAndFileKind(postId, "EVIDENCE")
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "승인 증빙이 없습니다."));
+    posterStorage.loadStored(evidence.getStorageKey());
+    post.approve();
 
-        PostFile poster = postFileRepository
-                .findByPost_IdAndFileKind(postId, "POSTER")
-                .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.CONFLICT,
-                                "전단지 이미지가 없습니다."
-                        )
-                );
+    approvalLogRepository.save(snapshotLog(post, reviewer, "APPROVED", null));
 
-        posterStorage.loadStored(poster.getStorageKey());
+    postRepository.saveAndFlush(post);
 
-        post.approve();
+    return response(post);
+  }
 
-        approvalLogRepository.save(
-                new ApprovalLog(post, reviewer, "APPROVED", null)
-        );
+  @Transactional
+  public CreatePostResponse reject(String email, Long postId, String reason) {
+    User reviewer = requireAdmin(email);
 
-        postRepository.saveAndFlush(post);
-
-        return response(post);
+    if (reason == null || reason.isBlank() || reason.length() > 2000) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "반려 사유는 비어 있지 않아야 하며 2000자 이하여야 합니다.");
     }
 
-    @Transactional
-    public CreatePostResponse reject(
-            String email,
-            Long postId,
-            String reason
-    ) {
-        User reviewer = requireAdmin(email);
+    Post post = requirePendingPost(postId);
 
-        if (reason == null || reason.isBlank()
-                || reason.length() > 2000) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "반려 사유는 비어 있지 않아야 하며 2000자 이하여야 합니다."
-            );
-        }
+    post.reject();
 
-        Post post = requirePendingPost(postId);
+    approvalLogRepository.save(snapshotLog(post, reviewer, "REJECTED", reason.strip()));
 
-        post.reject();
+    postRepository.saveAndFlush(post);
 
-        approvalLogRepository.save(
-                new ApprovalLog(
-                        post,
-                        reviewer,
-                        "REJECTED",
-                        reason.strip()
-                )
-        );
+    return response(post);
+  }
 
-        postRepository.saveAndFlush(post);
+  private User requireAdmin(String email) {
+    User reviewer =
+        userRepository
+            .findByEmail(email)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
 
-        return response(post);
+    if (!"ADMIN".equals(reviewer.getRole())) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 
-    private User requireAdmin(String email) {
-        User reviewer = userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.UNAUTHORIZED)
-                );
+    return reviewer;
+  }
 
-        if (!"ADMIN".equals(reviewer.getRole())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
+  private Post requirePendingPost(Long postId) {
+    Post post =
+        postRepository
+            .findForReview(postId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        return reviewer;
+    if (post.getStatus() != PostStatus.PENDING) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "승인 대기 중인 게시물만 처리할 수 있습니다.");
     }
 
-    private Post requirePendingPost(Long postId) {
-        Post post = postRepository.findForReview(postId)
-                .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND)
-                );
+    return post;
+  }
 
-        if (post.getStatus() != PostStatus.PENDING) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "승인 대기 중인 게시물만 처리할 수 있습니다."
-            );
-        }
+  private CreatePostResponse response(Post post) {
+    return new CreatePostResponse(post.getId(), post.getTitle(), post.getStatus());
+  }
 
-        return post;
-    }
-
-    private CreatePostResponse response(Post post) {
-        return new CreatePostResponse(
-                post.getId(),
-                post.getTitle(),
-                post.getStatus()
-        );
-    }
+  private ApprovalLog snapshotLog(Post post, User reviewer, String decision, String reason) {
+    ApprovalLog log = new ApprovalLog(post, reviewer, decision, reason);
+    log.capture(postFileRepository.findByPost_Id(post.getId()));
+    return log;
+  }
 }

@@ -1,18 +1,13 @@
 package com.brainbucket.post;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PostFileRepository extends JpaRepository<PostFile, Long> {
 
-    Optional<PostFile> findByPost_IdAndFileKind(
-            Long postId,
-            String fileKind
-    );
+  Optional<PostFile> findByPost_IdAndFileKind(Long postId, String fileKind);
 
-    boolean existsByPost_IdAndFileKind(
-            Long postId,
-            String fileKind
-    );
+  boolean existsByPost_IdAndFileKind(Long postId, String fileKind);
+
+  java.util.List<PostFile> findByPost_Id(Long postId);
 }

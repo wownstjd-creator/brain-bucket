@@ -1,9 +1,3 @@
 package com.brainbucket.user;
 
-public record SignupResponse(
-        Long id,
-        String email,
-        String displayName,
-        String role
-) {
-}
+public record SignupResponse(Long id, String email, String displayName, String role) {}

@@ -24,6 +24,13 @@
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `approval_logs` (
+  `original_type` VARCHAR(255) NULL,
+  `evidence_type` VARCHAR(255) NULL,
+  `poster_type` VARCHAR(255) NULL,
+  `original_key` VARCHAR(512) NULL,
+  `evidence_key` VARCHAR(512) NULL,
+  `poster_key` VARCHAR(512) NULL,
+  `snapshot` LONGTEXT NULL,
   `id` bigint NOT NULL AUTO_INCREMENT,
   `post_id` bigint NOT NULL,
   `reviewer_id` bigint NOT NULL,
@@ -83,6 +90,8 @@ CREATE TABLE `post_files` (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `posts` (
+  `version` BIGINT NOT NULL DEFAULT 0,
+  `display_from` DATE NULL,
   `id` bigint NOT NULL AUTO_INCREMENT,
   `author_id` bigint NOT NULL,
   `title` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,

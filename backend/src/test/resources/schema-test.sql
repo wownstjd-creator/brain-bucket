@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS bookmarks(user_id BIGINT NOT NULL,post_id BIGINT NOT NULL,created_at TIMESTAMP NOT NULL,PRIMARY KEY(user_id,post_id));
