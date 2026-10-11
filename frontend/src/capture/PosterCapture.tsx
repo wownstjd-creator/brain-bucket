@@ -7,6 +7,7 @@ import { normalizePhoto, correctPhoto } from './image';
 import { emptyFields, extractPoster, type PosterFields, type Extraction } from './extract';
 import { api, type Member } from './api';
 import AccountPanel from './AccountPanel';
+import { optionalDateTime } from './formRules';
 
 const labels:Record<keyof PosterFields,string>={title:'제목',organizer:'주최자',category:'분류',description:'상세 설명',location:'장소',applicationUrl:'신청 링크',eventDate:'행사 날짜',eventTime:'행사 시간',deadlineDate:'신청 마감일',deadlineTime:'마감 시간',postingStart:'게시 시작일',postingEnd:'게시 종료일'};
 const cornerNames=['왼쪽 위','오른쪽 위','오른쪽 아래','왼쪽 아래'];
@@ -18,6 +19,7 @@ export default function PosterCapture({editPost}:{editPost?:BoardPost}) {
   const [confidence,setConfidence]=useState<number|null>(null),[localNotice,setLocalNotice]=useState('');
   const stage=useRef<HTMLDivElement>(null),form=useRef<HTMLFormElement>(null),worker=useRef<Worker|null>(null),generation=useRef(0),draftId=useRef<string|undefined>(editPost?.id),memberId=useRef<number|undefined>(undefined),generated=useRef(new Set<keyof PosterFields>());
   const revision=useRef<number|undefined>(editPost?.version),uploaded=useRef<Record<string,string>>({});
+  const [showViewCount,setShowViewCount]=useState(editPost?.showViewCount ?? true);
   const [evidence,setEvidence]=useState(editPost?.evidenceUrl||''),[submitted,setSubmitted]=useState(false);
   useEffect(()=>()=>{generation.current++;void worker.current?.terminate();worker.current=null;},[]);
   const resetReview=()=>{setConfirmed(false);setSaved('');};
@@ -45,12 +47,14 @@ export default function PosterCapture({editPost}:{editPost?:BoardPost}) {
   };
   const moveCorner=(index:number,x:number,y:number)=>{setPoints(old=>old.map((p,i)=>i===index?{x:Math.max(0,Math.min(1,x)),y:Math.max(0,Math.min(1,y))}:p));setResult('');resetReview();};
   const save=async(submit=false)=>{
-    if(!member||!confirmed||!form.current?.reportValidity())return;
-    if(!fields.title.trim()||!fields.organizer.trim()){setError('제목과 주최자를 입력해주세요.');return;}
-    if((fields.eventDate&&!fields.eventTime)||(!fields.eventDate&&fields.eventTime)||(fields.deadlineDate&&!fields.deadlineTime)||(!fields.deadlineDate&&fields.deadlineTime)){setError('행사와 신청 마감은 날짜·시간을 함께 입력하거나 둘 다 비워주세요.');return;}
+    if(!member||!form.current?.reportValidity())return;
+    if(submit&&!confirmed){setError('원본과 비교해 내용을 확인한 뒤 체크해주세요.');return;}
+    if(submit&&(!fields.title.trim()||!fields.organizer.trim())){setError('승인 요청에는 제목과 주최자가 필요해요.');return;}
+    let eventAt:string|null,deadlineAt:string|null;
+    try{eventAt=optionalDateTime(fields.eventDate,fields.eventTime);deadlineAt=optionalDateTime(fields.deadlineDate,fields.deadlineTime,true);}catch(e){setError((e as Error).message);return;}
     if(submit&&(!result||!evidence||!fields.postingStart||!fields.postingEnd)){setError('보정한 전단·승인 증빙·게시 시작일과 종료일을 모두 확인해주세요.');return;}
     setSaving(true);setError('');setSaved('');try{
-      let response=await api.save({title:fields.title,organizer:fields.organizer,category:fields.category,description:fields.description,location:fields.location,applicationUrl:fields.applicationUrl,eventAt:fields.eventDate?`${fields.eventDate}T${fields.eventTime}:00`:null,deadlineAt:fields.deadlineDate?`${fields.deadlineDate}T${fields.deadlineTime}:00`:null,showViewCount:true,postingStart:fields.postingStart||null,postingEnd:fields.postingEnd||null,version:revision.current},draftId.current);
+      let response=await api.save({title:fields.title,organizer:fields.organizer,category:fields.category,description:fields.description,location:fields.location,applicationUrl:fields.applicationUrl,eventAt,deadlineAt,showViewCount,postingStart:fields.postingStart||null,postingEnd:fields.postingEnd||null,version:revision.current},draftId.current);
       draftId.current=response.id;revision.current=response.version;
       for(const [kind,dataUrl] of [['POSTER',result],['ORIGINAL',source],['EVIDENCE',evidence]]){
         if(dataUrl.startsWith('data:')&&uploaded.current[kind]!==dataUrl){response=await api.upload(response.id,kind,dataUrl,revision.current);revision.current=response.version;uploaded.current[kind]=dataUrl;}
@@ -79,18 +83,19 @@ export default function PosterCapture({editPost}:{editPost?:BoardPost}) {
       <p className="demo-note">사진 인식은 이 브라우저에서 처리해요. 첫 실행 시 인식 프로그램과 언어 모델을 내려받습니다. AI 해상도 확대 기능은 포함하지 않았어요.</p>
     </section><section className="information-column" aria-label="게시 정보 확인"><h2>내용을 확인해주세요</h2><p className="demo-note">읽은 정보는 자동으로 채워지고, 모든 항목을 수정할 수 있어요.</p>{extraction.warnings.length>0&&<ul className="recognition-warnings">{extraction.warnings.map(message=><li key={message}>{message}</li>)}</ul>}
       <form ref={form} onSubmit={e=>{e.preventDefault();void save();}}><fieldset disabled={busy||saving||submitted} className="capture-fields">
-        {input('title','text',true,150)}{input('organizer','text',true,100)}<div className="field"><label htmlFor="poster-category">분류</label><select id="poster-category" value={fields.category} onChange={e=>change('category',e.target.value)}>{categories.map(category=><option key={category}>{category}</option>)}</select></div>
-        {input('location','text',false,150)}{input('applicationUrl','url',false,2048)}<div className="date-pair">{input('eventDate','date')}{input('eventTime','time')}</div><div className="date-pair">{input('deadlineDate','date')}{input('deadlineTime','time')}</div><div className="date-pair">{input('postingStart','date')}{input('postingEnd','date')}</div>
+        {input('title','text',false,150)}{input('organizer','text',false,100)}<p className="demo-note">제목·주최자는 승인 요청할 때 필요해요. 작성 중에는 비워두고 임시 저장할 수 있어요.</p><div className="field"><label htmlFor="poster-category">분류</label><select id="poster-category" value={fields.category} onChange={e=>change('category',e.target.value)}>{categories.map(category=><option key={category}>{category}</option>)}</select></div>
+        {input('location','text',false,150)}{input('applicationUrl','url',false,2048)}<div className="date-pair">{input('eventDate','date')}{input('eventTime','time')}</div><div className="date-pair">{input('deadlineDate','date')}{input('deadlineTime','time')}</div><div className="date-pair">{input('postingStart','date')}{input('postingEnd','date')}</div><p className="demo-note">신청 링크·장소·행사·마감은 선택 항목이에요. 시간을 비우면 행사는 00:00, 신청 마감은 23:59로 저장돼요.</p>
         <div className="field"><label htmlFor="poster-description">상세 설명</label><textarea id="poster-description" rows={6} value={fields.description} maxLength={10000} onChange={e=>change('description',e.target.value)}/></div>
+        <label className="check-row"><input type="checkbox" checked={showViewCount} onChange={e=>{setShowViewCount(e.target.checked);resetReview();}}/>공개 화면에 조회수 표시</label>
         <label className="check-row review-check"><input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/>원본과 비교해 제목·날짜·내용을 확인했어요.</label>
       </fieldset></form>
       <section className="approval-note"><strong>승인 증빙 첨부</strong><p>담당자가 확인할 게시 허가 자료를 이미지로 첨부해주세요. 원본과 증빙은 작성자·담당자만 볼 수 있습니다.</p><input aria-label="승인 증빙 이미지" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy||saving||submitted} onChange={e=>{void selectEvidence(e.target.files?.[0]);e.target.value='';}}/>{evidence&&<img src={evidence} alt="승인 증빙 미리보기" style={{maxHeight:200,marginTop:12}}/>}</section>
       <AccountPanel onMember={user=>{setMember(user);if(memberId.current!==undefined&&memberId.current!==user?.id){draftId.current=undefined;revision.current=undefined;uploaded.current={};setSaved('');setSubmitted(false);}memberId.current=user?.id;}}/>
       <div className="publish-limit"><strong>담당자 승인 후 공개됩니다</strong><p>사진·내용을 임시 저장하거나, 확인을 마치고 승인 요청할 수 있어요. 승인된 전단을 수정하면 공개가 중단되고 재승인이 필요해요.</p></div>
-      <button type="button" className="secondary full" disabled={!member||!confirmed||saving||busy||submitted} onClick={()=>void save(false)}>{saving?'저장 중…':'임시 저장'}</button><button type="button" className="primary full publish-button" disabled={!member||!confirmed||saving||busy||submitted} onClick={()=>void save(true)}>{submitted?'승인 요청 완료':'게시하기 · 승인 요청'}</button>
+      <button type="button" className="secondary full" disabled={!member||saving||busy||submitted} onClick={()=>void save(false)}>{saving?'저장 중…':'임시 저장'}</button><button type="button" className="primary full publish-button" disabled={!member||!confirmed||saving||busy||submitted} onClick={()=>void save(true)}>{submitted?'승인 요청 완료':'게시하기 · 승인 요청'}</button>
       {submitted&&<a className="secondary full" href="#/mine">내 대자보에서 확인하기</a>}
       {error&&<p role="alert" className="error">{error}</p>}{saved&&<p role="status" className="saved-notice">{saved}</p>}
-      <p className="demo-note">저장하지 않은 변경은 화면을 떠나면 사라져요. 임시 저장 또는 승인 요청으로 보관해주세요.</p>
+      <p className="demo-note">저장하지 않은 변경은 화면을 떠나면 사라져요. 임시 저장 또는 승인 요청으로 보관해주세요.</p><p className="demo-note" role="status">{!member?'저장하려면 로그인해주세요.':!confirmed?'임시 저장은 바로 가능해요. 승인 요청하려면 내용 확인 체크를 해주세요.':''}</p>
     </section></div>
   </main>;
 }

@@ -1,4 +1,5 @@
 import type { BoardPost } from '../types';
+import { optionalUrl } from './formRules.ts';
 export interface Member {id:number;email:string;displayName:string;role:string;}
 export interface DraftInput {title:string;organizer:string;category:string;description:string;location:string;applicationUrl:string;eventAt:string|null;deadlineAt:string|null;showViewCount:boolean;postingStart?:string|null;postingEnd?:string|null;version?:number;}
 export type DraftResult = BoardPost;
@@ -21,7 +22,7 @@ export async function request<T>(path:string,method='GET',body?:unknown):Promise
       const token=await csrf.json();headers[token.headerName]=token.token;if(body!==undefined&&!(body instanceof FormData))headers['Content-Type']='application/json';
     }
     const response=await fetch(actual,{method,headers,credentials:'include',signal:controller.signal,body:body===undefined?undefined:body instanceof FormData?body:JSON.stringify(body)});
-    if(!response.ok){const messages:Record<number,string>={400:'입력 형식과 길이를 확인해주세요.',401:'로그인이 필요하거나 이메일·비밀번호가 올바르지 않아요.',403:'접근 권한 또는 로그인 세션을 확인해주세요.',404:'대자보를 찾을 수 없어요.',409:'중복 이메일이거나 현재 상태에서 수정할 수 없어요.',500:'백엔드 서버를 실행했는지 확인해주세요.',502:'백엔드 서버에 연결할 수 없어요.'};let detail='';try{detail=(await response.json()).message||'';}catch{}throw new ApiError(response.status,detail||messages[response.status]||`요청에 실패했어요 (${response.status}).`);}
+    if(!response.ok){const messages:Record<number,string>={400:'입력 형식과 길이를 확인해주세요.',401:'로그인이 필요하거나 이메일·비밀번호가 올바르지 않아요.',403:'접근 권한 또는 로그인 세션을 확인해주세요.',404:'대자보를 찾을 수 없어요.',409:'중복 이메일이거나 현재 상태에서 수정할 수 없어요.',413:'첨부 파일은 서버 업로드 한도 10MB 이하여야 해요.',500:'백엔드 서버를 실행했는지 확인해주세요.',502:'백엔드 서버에 연결할 수 없어요.'};let detail='';try{const errorBody=await response.json();detail=errorBody.message||errorBody.detail||'';}catch{}throw new ApiError(response.status,detail||messages[response.status]||`요청에 실패했어요 (${response.status}).`);}
     if(response.status===204)return undefined as T;
     const data=await response.json();
     if(actual.startsWith('/api/posts/public?')||actual.startsWith('/api/admin/posts/managed')) {
@@ -50,7 +51,7 @@ export const api={
     return request<DraftResult>(`/api/posts/mine/${id}`);
   },
   submit:async(id:string,_version?:number)=>{await request(`/api/posts/mine/${id}/approval-request`,'POST');return request<DraftResult>(`/api/posts/mine/${id}`);},
-  save:async(input:DraftInput,id?:string)=>{const result=await request<{id:number}>(id?`/api/posts/mine/${id}`:'/api/posts',id?'PUT':'POST',{...input,category:categoryCodes[input.category]||input.category,displayFrom:input.postingStart,displayUntil:input.postingEnd});return request<DraftResult>(`/api/posts/mine/${result.id}`);},
+  save:async(input:DraftInput,id?:string)=>{const result=await request<{id:number}>(id?`/api/posts/mine/${id}`:'/api/posts',id?'PUT':'POST',{...input,applicationUrl:optionalUrl(input.applicationUrl),category:categoryCodes[input.category]||input.category,displayFrom:input.postingStart,displayUntil:input.postingEnd});return request<DraftResult>(`/api/posts/mine/${result.id}`);},
 };
 const categoryCodes:Record<string,string>={'동아리':'CLUB','대회':'CONTEST','행사':'EVENT','공지':'NOTICE','기타':'OTHER'};
 function normalize(p:any,privateView=false):BoardPost {

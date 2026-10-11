@@ -7,6 +7,7 @@ export interface BoardPost {
   id: string;
   version?: number;
   viewCount?: number|null;
+  showViewCount?: boolean;
   publishedAt?: string;
   postingStart?: string;
   originalUrl?: string;

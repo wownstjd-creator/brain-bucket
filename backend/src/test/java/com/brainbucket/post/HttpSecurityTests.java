@@ -77,6 +77,22 @@ class HttpSecurityTests {
         users.saveAndFlush(
             new User("http-admin@example.com", encoder.encode("TestPass123!"), "HTTP admin"));
     db.update("update users set role='ADMIN' where id=?", admin.getId());
+    var signupClient = client();
+    assertEquals(201, call(signupClient, "/api/auth/signup", "POST",
+        "{\"email\":\"http-signup@example.com\",\"password\":\"TestPass123!\",\"displayName\":\"Signup\"}",
+        csrf(signupClient)).statusCode());
+    login(signupClient, "http-signup@example.com");
+    var badSignup = call(signupClient, "/api/auth/signup", "POST",
+        "{\"email\":\"invalid\",\"password\":\"TestPass123!\",\"displayName\":\"Signup\"}", csrf(signupClient));
+    assertEquals(400, badSignup.statusCode());
+    assertTrue(badSignup.body().contains("message"));
+    assertTrue(badSignup.body().contains("이메일 형식"));
+    var badLink = call(signupClient, "/api/posts", "POST",
+        "{\"applicationUrl\":\"invalid\"}", csrf(signupClient));
+    assertEquals(400, badLink.statusCode());
+    assertTrue(badLink.body().contains("http/https"));
+    assertEquals(201, call(signupClient, "/api/posts", "POST",
+        "{\"applicationUrl\":null}", csrf(signupClient)).statusCode());
     var anonymous = client();
     assertEquals(401, call(anonymous, "/api/admin/posts", "GET", null, null).statusCode());
     var owner = client();
