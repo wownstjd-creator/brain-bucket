@@ -45,6 +45,9 @@ uploads/
 .env
 **/node_modules/
 **/dist/
-backend/src/main/resources/static/
 **/target/
 **/uploads/
+
+# Database backups contain account and post data
+backups/
+*.sql.tmp

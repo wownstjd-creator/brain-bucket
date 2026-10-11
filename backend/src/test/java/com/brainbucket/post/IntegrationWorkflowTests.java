@@ -88,7 +88,7 @@ class IntegrationWorkflowTests {
                 new MockMultipartFile("file", new byte[] {1}),
                 null));
     reviews.approve("reviewer@example.com", id);
-    assertTrue(published.getPosts(false, 0, 20, null, null, null).isEmpty());
+    assertTrue(published.getPosts(false, 0, 20, "Recruit", null, null).isEmpty());
     status(404, () -> published.getDetail(id));
     status(404, () -> published.getPoster(id));
     management.schedule(
@@ -209,6 +209,41 @@ class IntegrationWorkflowTests {
     status(404,()->files.history(other,id));
     assertTrue(files.history(owner,id).stream().anyMatch(h->h.decision().equals("DELETED")));
     assertArrayEquals(evidence,files.historical(owner,id,history.id(),"EVIDENCE").resource().getInputStream().readAllBytes());
+  }
+
+  @Test
+  void pagedCardsSearchAndBookmarksKeepServerFilters() throws Exception {
+    String owner="paged@example.com", admin="paged-admin@example.com";
+    users.saveAndFlush(new User(owner,"hash","Paged"));
+    var reviewer=users.saveAndFlush(new User(admin,"hash","Admin"));
+    db.update("update users set role='ADMIN' where id=?",reviewer.getId());
+    var ids=new java.util.ArrayList<Long>();
+    for(int i=0;i<22;i++){
+      var input=new CreatePostRequest("PageNeedle_"+i,"PagedOrg","CLUB","Page details","N111",null,null,null,today.plusDays(20),today,null,true);
+      Long id=drafts.createDraft(owner,input).id();ids.add(id);
+      files.save(owner,id,"POSTER",image(0x010101+i),null);
+      files.save(owner,id,"EVIDENCE",image(0x020202+i),null);
+      approval.requestApproval(owner,id);reviews.approve(admin,id);bookmarks.save(owner,id);
+    }
+    var first=published.getPosts(false,0,20,"PageNeedle_","CLUB",today.plusDays(20).getYear());
+    var second=published.getPosts(false,1,20,"PageNeedle_","CLUB",null);
+    assertEquals(20,first.size());assertEquals(2,second.size());
+    assertTrue(first.stream().noneMatch(p->second.stream().anyMatch(q->p.id().equals(q.id()))));
+    assertTrue(published.getPosts(false,0,20,"PageNeedle_","EVENT",null).isEmpty());
+    assertEquals(20,drafts.getMyCards(owner,0,20).size());assertEquals(2,drafts.getMyCards(owner,1,20).size());
+    assertTrue(drafts.getMyCards(owner,0,20).stream().allMatch(p->p.hasEvidence()));
+    assertTrue(management.cards(admin,"PENDING",0,20).isEmpty());
+    status(403,()->management.cards(owner,"ALL",0,20));
+    assertEquals(20,bookmarks.list(owner,0,20,"PageNeedle_","CLUB",null).size());
+    assertEquals(2,bookmarks.list(owner,1,20,"PageNeedle_","CLUB",null).size());
+    assertTrue(bookmarks.list(owner,0,20,"absent","CLUB",null).isEmpty());
+    // Literal underscore must not be a wildcard.
+    assertTrue(bookmarks.list(owner,0,20,"PageNeedle__","CLUB",null).isEmpty());
+    Long archived=ids.get(0);
+    management.schedule(admin,archived,new ScheduleRequest(today.minusYears(1).minusDays(2),today.minusYears(1),null,null,"Archive",null));
+    assertTrue(published.archiveYears().contains(today.minusYears(1).getYear()));
+    assertEquals(1,published.getPosts(true,0,20,"PageNeedle_","CLUB",today.minusYears(1).getYear()).size());
+    assertEquals(1,bookmarks.list(owner,0,20,"PageNeedle_","CLUB",today.minusYears(1).getYear()).size());
   }
 
 }

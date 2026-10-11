@@ -38,4 +38,7 @@ public interface PostRepository
   Page<Post> findByStatusAndDeletedAtIsNull(PostStatus status, Pageable pageable);
 
   Optional<Post> findByIdAndDeletedAtIsNull(Long id);
+  @org.springframework.data.jpa.repository.Query("select distinct year(p.displayUntil) from Post p where p.status=com.brainbucket.post.PostStatus.APPROVED and p.deletedAt is null and (p.displayFrom is null or p.displayFrom<=:today) and p.displayUntil<:today order by year(p.displayUntil) desc")
+  java.util.List<Integer> archiveYears(@org.springframework.data.repository.query.Param("today") java.time.LocalDate today);
 }
+

@@ -23,6 +23,10 @@ public class ManagementController {
     return s.list(a.getName(), status, page, size);
   }
 
+  @GetMapping("/cards")
+  public List<MyPostDetailResponse> cards(Authentication a,@RequestParam(defaultValue="ALL") String status,
+      @RequestParam(defaultValue="0") int page,@RequestParam(defaultValue="20") int size){return s.cards(a.getName(),status,page,size);}
+
   @PostMapping("/{id}/hide")
   public CreatePostResponse hide(
       Authentication a, @PathVariable Long id, @RequestBody ManagementService.ChangeRequest r) {

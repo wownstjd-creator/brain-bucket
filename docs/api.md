@@ -145,3 +145,16 @@ UPDATE users SET role='ADMIN' WHERE email='본인_테스트_관리자_이메일'
 - DELETE /api/posts/mine/{id}/attachments/{kind}?version={version}: DRAFT/REJECTED의 POSTER/EVIDENCE/ORIGINAL 첨부 제거. 이력에서 참조한 파일은 보존합니다.
 
 삭제는 관리자 내림/복구와 별개입니다. 제거 후 최신 상세를 다시 조회해 version을 갱신해야 합니다.
+
+## 페이지 조회와 비밀번호 변경 — 2026-10-11
+
+| 경로 | 요청/응답 | 권한 |
+| --- | --- | --- |
+| GET /api/posts/public?archived=false&page=0&size=20&search=검색어&category=CLUB&year=2026 | 해당 페이지 배열. category/year/search는 선택 | 공개 |
+| GET /api/posts/public/years | 공개 가능한 종료 글의 연도 배열, 내림차순 | 공개 |
+| GET /api/posts/mine/cards?page=0&size=20 | 본인 글의 상세 카드 배열, version/hasEvidence/hasOriginal 포함 | 작성자 |
+| GET /api/admin/posts/cards?status=ALL&page=0&size=20 | 관리 카드 배열. ALL/PENDING/APPROVED/HIDDEN/REJECTED | 관리자 |
+| GET /api/bookmarks?page=0&size=20&search=검색어&category=CLUB&year=2026 | 공개 가능한 저장 글의 해당 페이지 배열 | 로그인 |
+| POST /api/auth/password | currentPassword/newPassword JSON, 성공 204·현재 세션 종료 | 로그인+CSRF |
+
+page>=0, size=1~50. 화면 기본 20개. 목록 배열을 받은 프론트가 다음 페이지를 자동으로 끝까지 수집하지 않습니다. 조건 변경은 첫 페이지로 돌아갑니다. category 값은 CLUB/CONTEST/EVENT/NOTICE/OTHER입니다. 검색의 %/_는 와일드카드가 아닌 문자로 처리합니다. 잘못된 현재 비밀번호/새 비밀번호는 400, 미로그인은 401, CSRF 누락은 403입니다. 변경 후 새 CSRF 토큰을 받아 새 비밀번호로 로그인합니다. 다른 기기의 기존 세션은 유지됩니다.

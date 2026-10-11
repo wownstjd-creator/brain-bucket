@@ -42,6 +42,8 @@ public class User {
     }
   }
 
+  public void changePassword(String hash) { this.passwordHash = hash; }
+
   public Long getId() {
     return id;
   }

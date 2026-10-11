@@ -31,6 +31,10 @@ public class PostController {
     return postService.getMyPosts(authentication.getName(), page, size);
   }
 
+  @GetMapping("/mine/cards")
+  public List<MyPostDetailResponse> cards(Authentication a,@RequestParam(defaultValue="0") int page,
+      @RequestParam(defaultValue="20") int size){return postService.getMyCards(a.getName(),page,size);}
+
   @GetMapping("/mine/{postId}")
   public MyPostDetailResponse getMyPost(Authentication authentication, @PathVariable Long postId) {
     return postService.getMyPost(authentication.getName(), postId);

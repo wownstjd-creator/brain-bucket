@@ -17,6 +17,9 @@ public class PublicPostController {
     this.publicPostService = publicPostService;
   }
 
+  @GetMapping("/years")
+  public List<Integer> years(){return publicPostService.archiveYears();}
+
   @GetMapping("/{postId}")
   public PublicPostDetailResponse getDetail(@PathVariable Long postId) {
     return publicPostService.getDetail(postId);

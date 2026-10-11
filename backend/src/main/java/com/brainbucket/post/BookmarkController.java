@@ -18,8 +18,10 @@ public class BookmarkController {
   public List<PublicPostResponse> list(
       Authentication a,
       @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "20") int size) {
-    return s.list(a.getName(), page, size);
+      @RequestParam(defaultValue = "20") int size,
+      @RequestParam(required=false) String search,@RequestParam(required=false) String category,
+      @RequestParam(required=false) Integer year) {
+    return s.list(a.getName(), page, size,search,category,year);
   }
 
   @GetMapping("/ids")

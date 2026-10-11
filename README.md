@@ -1,72 +1,86 @@
-# BrainBucket / 한눈에 통합본
+# BrainBucket / 한눈에
 
-2026-10-10 업로드된 brain-bucket1010.zip의 MySQL 백엔드를 기준으로, 친구의 프론트 및 추가 기능을 통합한 소스입니다. 기존 회원 인증·API·multipart·파일 저장을 유지합니다. 친구의 H2 DB와 관리자 계정은 포함하지 않습니다.
+친구의 React 프론트와 기존 Spring Boot·MySQL 백엔드를 통합한 대자보 서비스입니다. Java 21 이상, MySQL 8이 필요합니다. 프론트 개발·재빌드에는 Node 22.18 이상이 필요합니다.
 
-## 적용 순서
+## 기존 프로젝트에서 업데이트
 
-1. 기존 프로젝트·MySQL DB·backend/uploads를 백업합니다. ZIP은 별도 폴더에 풉니다.
-2. 기존 MySQL DB에는 schema.sql을 다시 실행하지 않습니다. 기존 display_until 변경이 적용된 상태에서 아래 변경 SQL만 실행합니다.
-3. 기존 데이터를 사용하려면 기존 backend/uploads를 새 backend/uploads로 복사합니다. DB만 복사하면 이미지 파일이 없습니다.
-4. 새 폴더의 backend에서 DB 환경변수를 지정하고 실행합니다.
-5. ZIP에 빌드된 화면이 backend/src/main/resources/static에 포함되어 있어 http://localhost:8080/#/board로 바로 접속할 수 있습니다. 프론트 소스를 수정하려면 frontend에서 npm ci 후 npm run dev로 http://localhost:5175에 접속합니다.
-6. 기존 MySQL의 계정으로 로그인합니다. 회원가입한 계정을 ADMIN으로 바꾸려면 기존 API 문서의 SQL을 참고합니다.
-7. 기능 검증 후 변경 파일을 기존 저장소의 통합 브랜치에 반영합니다. 기존 backend/.../user/UserController.java는 진단용 사용자 수 API라 이번 소스에서 삭제했습니다. 기존 폴더에 덮어쓰는 경우 그 파일도 삭제합니다.
+1. 기존 저장소에서 변경을 커밋한 뒤 최신 코드를 pull합니다.
+2. 서버를 종료하고 저장소 최상위에서 아래 명령으로 다시 실행합니다.
 
-저장소 최상위에서 MySQL에 접속 후 mysql> 창에서:
+```powershell
+.\scripts\run.ps1
+```
+
+기존 DB와 uploads는 그대로 사용합니다. 서버 시작 시 Flyway가 DB 변경을 자동 적용합니다. 별도의 SOURCE 명령은 필요하지 않습니다. 이미 수동 SQL을 실행한 DB도 컬럼을 중복 추가하지 않습니다. Git pull 자체가 실행 중인 서버를 갱신하지는 않으므로 재시작해야 합니다.
+
+## 처음 실행하는 사람
+
+Java 21 이상과 MySQL 8을 설치하고 MySQL 서비스를 실행합니다. 사용할 빈 DB는 처음 한 번 생성합니다.
 
 ```sql
-USE brain_bucket;
-SOURCE database/migrations/20261010_integrate.sql;
-SHOW COLUMNS FROM posts LIKE 'display_from';
-SHOW COLUMNS FROM posts LIKE 'version';
+CREATE DATABASE IF NOT EXISTS brain_bucket CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-새 빈 DB는 database/schema.sql을 사용합니다. 변경 SQL은 컬럼 존재 여부를 확인하여 기존 데이터를 삭제하지 않습니다. ALTER/CREATE ROUTINE 권한이 필요하며 MySQL DDL은 전체 원자적 롤백이 아닙니다. 실행 오류가 있으면 원인을 해결한 뒤 재시도합니다. 임시 프로시저가 남았다면 DROP PROCEDURE IF EXISTS bb_add_column 후 실행할 수 있습니다.
-
-PowerShell 1 — backend (Java 21 이상):
+저장소 최상위의 .env.example을 .env로 복사하고 DB_USERNAME·DB_PASSWORD를 자신의 MySQL 계정으로 수정합니다. `.env`는 커밋하지 않습니다. 자동 변경을 수행하는 DB 계정에는 해당 DB의 CREATE·ALTER·INDEX·REFERENCES와 데이터 읽기/쓰기 권한이 필요합니다.
 
 ```powershell
-cd backend
-$env:DB_USERNAME = "본인_DB_계정"
-$env:DB_PASSWORD = "본인_DB_비밀번호"
-.\mvnw.cmd spring-boot:run
+Copy-Item .env.example .env
+# .env를 편집한 다음 실행
+.\scripts\run.ps1
 ```
 
-PowerShell 2 — frontend (Node 22.18 이상 또는 24):
+브라우저에서 http://localhost:8080/#/board 에 접속합니다. 빌드된 화면은 backend/src/main/resources/static에 포함되므로 Node 없이 화면을 사용할 수 있습니다. 회원가입으로 일반 계정을 생성합니다. 친구의 H2 계정이나 다른 사람의 MySQL 계정은 자동 복사되지 않습니다. 관리자 지정 절차는 docs/api.md를 참고하세요.
+
+이미 JAVA_HOME·DB 환경변수를 설정했다면 backend에서 `.\mvnw.cmd spring-boot:run`으로 직접 실행할 수 있습니다. `.env`를 읽는 것은 scripts/run.ps1이며 직접 Maven을 실행할 때는 환경변수를 지정해야 합니다.
+
+## DB 자동 업데이트
+
+- V1: 빈 DB에 users·posts·post_files·approval_logs·bookmarks를 생성합니다.
+- 기존 테이블이 있는 DB는 V1 기준선으로 등록하고 V2부터 적용합니다. 이 도입은 이 프로젝트의 기존 MySQL 스키마를 전제로 합니다. 임의의 다른 DB를 접속 대상으로 지정하지 마세요.
+- V2: posts의 display_until·display_from·version, approval_logs의 snapshot·첨부 저장 키·MIME 컬럼 중 없는 컬럼만 추가합니다. 기존 행을 삭제하거나 덮어쓰지 않습니다.
+- 적용 이력은 flyway_schema_history에 남으며 재시작 시 이미 적용된 버전은 건너뜁니다.
+- 자동 실행 파일은 backend/src/main/resources/db/migration과 backend/src/main/java/db/migration에 있습니다. 이후 구조 변경은 새 V3, V4 버전으로 추가하며 이미 배포한 버전은 수정하지 않습니다.
+- database/schema.sql과 database/migrations/20261010_integrate.sql은 수동 참고 자료입니다. 정상 실행 과정에서 따로 실행하지 않습니다. 기존 DB에 schema.sql을 다시 실행하지 마세요.
+- MySQL DDL은 전체 트랜잭션 롤백이 되지 않습니다. 최초 업데이트 전 DB를 백업하세요. 실패 시 로그의 원인을 해결하고 docs/database.md의 절차를 따릅니다.
+
+## 프론트 개발과 공유
+
+backend를 실행한 상태에서 별도 터미널의 frontend 폴더에서 `npm ci`, `npm run dev`를 실행하면 http://localhost:5175 에서 개발할 수 있습니다. /api는 8080으로 프록시됩니다. localhost와 127.0.0.1을 섞지 마세요.
+
+화면 소스를 수정한 뒤 저장소 최상위에서 다음을 실행합니다.
 
 ```powershell
-cd frontend
-npm ci
-npm run dev
+.\scripts\build.ps1
 ```
 
-프론트 개발 프록시는 8080 백엔드로 /api를 전달합니다. 두 창을 유지합니다. localhost와 127.0.0.1을 섞지 마세요. 기존 8180 H2 시연 서버와 이번 8080 MySQL 서버는 별개입니다.
+프론트 빌드 결과를 backend/src/main/resources/static에 복사하고 백엔드 테스트·JAR 빌드를 실행합니다. frontend/src 변경과 static 변경을 함께 커밋해야 다른 사람이 pull 후 서버 실행만으로 최신 화면을 볼 수 있습니다. target·node_modules·frontend/dist는 제외합니다.
 
-## 통합 기능
+## 기능
 
-- 작성·이미지 교체·승인/반려·관리자 조회·공개 조회·아카이브 유지.
-- displayFrom 게시 시작일, 미래 예약 전단의 공개 목록·상세·이미지 차단.
-- 관리자 내림·복구·행사/마감/게시 기간 변경, 사유·변경 전후 이력. 복구는 publishedAt 유지.
-- 증빙·입력 원본의 multipart 저장 및 작성자·관리자 전용 조회. 새 승인 요청·승인은 증빙 필수.
-- 승인/반려 당시 본문·이미지 저장 키·MIME 보존. 참조된 옛 이미지는 교체 후에도 유지.
-- APPROVED 본문 수정 시 DRAFT로 전환되어 공개 중단, 재승인 필요. HIDDEN·PENDING 수정 차단.
-- 선택적 version 검사, 이미지 변경 시 version 증가, 게시물 행 잠금으로 상태 전이 직렬화.
-- 서버 검색·분류·종료일 연도 필터와 페이지 처리.
-- 계정 스크랩: 브라우저 저장에서 MySQL bookmarks로 전환. 기존 브라우저 스크랩 자동 이관은 없음.
-- 조회수: 공개 상세/전단 열기에서 세션당 1회 집계. 비로그인 가능, CSRF 필요. 로그인 계정·사람별 정확한 순 방문자 집계는 아님.
-- 주요 생성/수정/이력 시각 한국 시간 통일, http/https 신청 링크 검사.
-- 친구 화면 디자인·사진 보정·브라우저 OCR 유지. API 변환은 frontend/src/capture/api.ts에 통합.
+- 일반 계정의 대자보 작성·임시 저장·승인 요청·요청 취소·삭제, 관리자 승인·반려.
+- 작성/반려 글의 첨부 제거, 비밀번호 변경 후 현재 기기 로그아웃.
+- 게시 시작/종료일, 관리자 내림·복구·일정 변경 및 처리 이력.
+- 증빙·원본 multipart 저장, 작성자·관리자 전용 조회와 승인 당시 본문·첨부 이력 보존.
+- 승인된 글 수정 시 공개 중단, 재승인 후 다시 공개.
+- 계정별 MySQL 스크랩, 세션별 조회수, 서버 검색·분류·연도 필터와 20개 단위 페이지 조회.
+- 친구 프론트의 사진 보정과 브라우저 OCR. 신청 URL·장소·행사/마감은 선택 항목이며 URL 입력 시 http/https 주소를 사용합니다.
 
-## 테스트 및 남은 확인
+UserController.java에는 회원가입 API가 있으므로 유지합니다. 진단용 사용자 수 조회 API는 제거했습니다.
 
-프론트 TypeScript/Vite 빌드와 13개 테스트, Java 컴파일 및 3개 테스트 클래스의 테스트가 통과했습니다. H2의 MySQL 호환 모드에서 실제 JPA·파일 저장·HTTP 세션/CSRF를 검증했습니다. 실제 MySQL 변경 SQL 실행, 기존 데이터 마이그레이션, 브라우저 화면·카메라·OCR 실기기 및 Docker 배포는 별도 확인이 필요합니다. 기존 승인 이력에는 과거 본문/이미지를 소급 복원하지 않습니다.
+## 데이터와 검증
 
-자세한 API: docs/api.md. 확인 항목: docs/verification.md. 제출용 피그마·명세서는 별도 작업입니다.
+DB에는 게시 내용·계정·스크랩·파일 저장 키가 저장되고 이미지 실물은 backend/uploads(또는 UPLOAD_DIR)에 저장됩니다. DB와 uploads를 함께 유지·백업해야 합니다. Git pull은 이미지와 계정 데이터를 전달하지 않습니다.
 
-## 빌드·배포 준비
+사용자 로컬에서 핵심 작성/승인/내림/복구/수정 흐름과 스크랩·조회수·검색을 확인했습니다. 후속 기능의 자동 테스트 및 검증 한계는 docs/verification.md를 참고하세요. 외부 서버·HTTPS·실제 백업 복구와 실기기 OCR은 아직 별도 검증이 필요합니다.
 
-PowerShell에서 .\scripts\build.ps1 실행 시 프론트 산출물을 Spring 정적 자원에 넣고 테스트·JAR 빌드를 수행합니다. JAVA_HOME·Node·MySQL 실행 환경을 준비해야 합니다. 최종 JAR은 backend/target에 생성되며 DB 환경변수를 넣고 java -jar로 실행합니다. 이 경우 화면과 API를 같은 8080 주소에서 제공합니다.
+[API 명세](docs/api.md) · [DB](docs/database.md) · [현재 기능 명세](docs/final-spec.md) · [배포/백업/복구](docs/deployment.md) · [검증](docs/verification.md).
 
-Dockerfile과 compose.yaml도 포함했습니다. .env.example을 .env로 복사하고 비밀번호를 설정한 뒤 docker compose up --build -d로 별도 새 MySQL 환경을 구성할 수 있습니다. DB·업로드는 볼륨으로 유지합니다. 기존 로컬 DB를 자동 가져오지는 않습니다. 외부 운영은 HTTPS 프록시를 구성한 뒤 COOKIE_SECURE=true로 설정하세요. Docker 실행은 이 환경에서 검증하지 않았습니다.
+## Docker
 
-커밋에 포함: 소스·문서·변경 SQL·배포 설정. 제외: DB 비밀번호, .env, uploads, target, node_modules. 관리자 권한·직인의 실제 운영 절차는 학교와 별도 협의합니다.
+.env에 DB_PASSWORD·MYSQL_ROOT_PASSWORD를 설정한 뒤 `docker compose up --build -d`로 별도 MySQL·앱 환경을 구성합니다. 빈 DB의 테이블도 앱의 Flyway가 생성하며 DB·uploads는 볼륨으로 유지됩니다. 로컬 DB를 자동 가져오지는 않습니다. Docker 실행과 외부 HTTPS 배포는 별도 검증이 필요합니다.
+
+## 커밋
+
+소스·문서·DB 자동 변경 파일·빌드된 static·스크립트·배포 설정을 포함합니다. .env·비밀번호·uploads·target·node_modules는 제외합니다. 제출용 피그마·명세서는 별도 작업입니다.
+
+실제 도메인 HTTPS 배포: 루트 .env에 DOMAIN을 설정하고 Linux 서버에서 `bash scripts/deploy.sh`를 실행합니다. 준비 사항과 백업/복구 명령은 docs/deployment.md에 있습니다.

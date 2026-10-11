@@ -147,4 +147,23 @@ class HttpSecurityTests {
     assertEquals(
         204, call(owner, "/api/bookmarks/" + id, "DELETE", null, csrf(owner)).statusCode());
   }
+  @Test
+  void passwordChangeValidatesCredentialsAndExpiresCurrentSession() throws Exception {
+    String email="password-http@example.com";
+    users.saveAndFlush(new User(email,encoder.encode("TestPass123!"),"Password"));
+    var c=client();login(c,email);
+    String path="/api/auth/password";
+    String body="{\"currentPassword\":\"TestPass123!\",\"newPassword\":\"ChangedPass456!\"}";
+    assertEquals(403,call(c,path,"POST",body,null).statusCode());
+    assertEquals(400,call(c,path,"POST",body.replace("TestPass123!","wrong"),csrf(c)).statusCode());
+    assertTrue(encoder.matches("TestPass123!",users.findByEmail(email).orElseThrow().getPasswordHash()));
+    assertEquals(400,call(c,path,"POST",body.replace("ChangedPass456!","tiny"),csrf(c)).statusCode());
+    assertEquals(400,call(c,path,"POST",body.replace("ChangedPass456!","TestPass123!"),csrf(c)).statusCode());
+    assertEquals(204,call(c,path,"POST",body,csrf(c)).statusCode());
+    assertEquals(401,call(c,"/api/auth/me","GET",null,null).statusCode());
+    assertEquals(401,call(c,"/api/auth/login","POST","{\"email\":\""+email+"\",\"password\":\"TestPass123!\"}",csrf(c)).statusCode());
+    assertEquals(200,call(c,"/api/auth/login","POST","{\"email\":\""+email+"\",\"password\":\"ChangedPass456!\"}",csrf(c)).statusCode());
+    assertTrue(encoder.matches("ChangedPass456!",users.findByEmail(email).orElseThrow().getPasswordHash()));
+  }
+
 }

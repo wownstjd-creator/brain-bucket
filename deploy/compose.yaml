@@ -1,0 +1,46 @@
+name: brain-bucket-production
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: brain_bucket
+      MYSQL_USER: brainbucket
+      MYSQL_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD}
+    volumes: [mysql_data:/var/lib/mysql]
+    healthcheck:
+      test: [CMD-SHELL, "mysqladmin ping -h localhost --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+  app:
+    build:
+      context: ..
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: jdbc:mysql://db:3306/brain_bucket
+      DB_USERNAME: brainbucket
+      DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD}
+      COOKIE_SECURE: 'true'
+      SERVER_FORWARD_HEADERS_STRATEGY: framework
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes: [uploads:/app/uploads]
+  proxy:
+    image: caddy:2
+    restart: unless-stopped
+    ports: ['80:80', '443:443', '443:443/udp']
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN to the public hostname}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [app]
+volumes:
+  mysql_data:
+  uploads:
+  caddy_data:
+  caddy_config:

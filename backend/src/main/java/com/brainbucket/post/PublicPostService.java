@@ -143,6 +143,9 @@ public class PublicPostService {
     return posts.getContent().stream().map(PublicPostResponse::from).toList();
   }
 
+  @Transactional(readOnly=true)
+  public List<Integer> archiveYears(){return postRepository.archiveYears(LocalDate.now(ZoneId.of("Asia/Seoul")));}
+
   private String escape(String s) {
     return s.replace("!", "!!").replace("%", "!%").replace("_", "!_");
   }

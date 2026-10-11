@@ -100,6 +100,15 @@ public class ManagementService {
         .getContent();
   }
 
+  @Transactional(readOnly=true)
+  public List<MyPostDetailResponse> cards(String email,String status,int page,int size){
+    // Reuse the existing permission, state and pagination validation.
+    var selected=list(email,status,page,size);
+    var byId=new HashMap<Long,Post>();
+    posts.findAllById(selected.stream().map(ManagedPost::id).toList()).forEach(p->byId.put(p.getId(),p));
+    return PostCards.from(selected.stream().map(p->byId.get(p.id())).toList(),files);
+  }
+
   public record ManagedPost(Long id, String title, PostStatus status, long version) {}
 
   public record ChangeRequest(String reason, Long version) {}

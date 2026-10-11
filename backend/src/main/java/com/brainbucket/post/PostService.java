@@ -85,6 +85,14 @@ public class PostService {
         .getContent();
   }
 
+  @Transactional(readOnly=true)
+  public List<MyPostDetailResponse> getMyCards(String email,int page,int size){
+    if(page<0||size<1||size>50)throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    var user=userRepository.findByEmail(email).orElseThrow(()->new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+    return PostCards.from(postRepository.findByAuthor_IdAndDeletedAtIsNull(user.getId(),
+      PageRequest.of(page,size,Sort.by(Sort.Order.desc("createdAt"),Sort.Order.desc("id")))).getContent(),postFileRepository);
+  }
+
   @Transactional(readOnly = true)
   public MyPostDetailResponse getMyPost(String email, Long postId) {
 
