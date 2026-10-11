@@ -50,6 +50,10 @@ export const api={
     await request(`/api/posts/mine/${id}/attachments/${kind.toLowerCase()}${version===undefined?'':`?version=${version}`}`,'PUT',form);
     return request<DraftResult>(`/api/posts/mine/${id}`);
   },
+  removeAttachment:async(id:string,kind:string,version:number)=>{
+    await request(`/api/posts/mine/${id}/attachments/${kind.toLowerCase()}?version=${version}`,'DELETE');
+    return request<DraftResult>(`/api/posts/mine/${id}`);
+  },
   submit:async(id:string,_version?:number)=>{await request(`/api/posts/mine/${id}/approval-request`,'POST');return request<DraftResult>(`/api/posts/mine/${id}`);},
   save:async(input:DraftInput,id?:string)=>{const result=await request<{id:number}>(id?`/api/posts/mine/${id}`:'/api/posts',id?'PUT':'POST',{...input,applicationUrl:optionalUrl(input.applicationUrl),category:categoryCodes[input.category]||input.category,displayFrom:input.postingStart,displayUntil:input.postingEnd});return request<DraftResult>(`/api/posts/mine/${result.id}`);},
 };

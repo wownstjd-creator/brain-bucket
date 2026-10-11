@@ -56,7 +56,7 @@ public class BookmarkService {
   @Transactional(readOnly = true)
   public List<Long> ids(String email) {
     return db.queryForList(
-        "select post_id from bookmarks where user_id=? order by created_at desc,post_id desc",
+        "select b.post_id from bookmarks b join posts p on p.id=b.post_id where b.user_id=? and p.deleted_at is null order by b.created_at desc,b.post_id desc",
         Long.class,
         user(email));
   }

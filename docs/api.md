@@ -135,3 +135,13 @@ UPDATE users SET role='ADMIN' WHERE email='본인_테스트_관리자_이메일'
 - 신청 URL이 비어 있으면 null을 전송합니다. 조회수 공개 여부는 수정 화면에서 유지/선택합니다.
 - 날짜만 입력하면 화면에 안내한 대로 행사는 00:00, 마감은 23:59로 저장됩니다.
 - 처리 가능한 API 오류는 status/message/fields JSON을 제공합니다. 검증 오류는 fields에 항목별 메시지를 포함합니다. 업로드 크기 초과는 413, 수정 충돌은 409입니다. 보안 필터의 인증/권한 응답은 기존 401/403을 유지합니다.
+
+## 작성자 삭제·승인 취소·첨부 제거
+
+모든 요청은 로그인·CSRF 토큰·현재 version을 요구합니다. 성공은 204이며 타인 글은 404, 오래된 version은 409입니다.
+
+- DELETE /api/posts/mine/{id}?version={version}: 작성자 논리 삭제. 공개/현재 첨부/스크랩 조회에서 제외하고 처리 이력은 작성자·관리자에 보존합니다.
+- POST /api/posts/mine/{id}/approval-cancel?version={version}: PENDING만 DRAFT로 변경하고 REQUEST_CANCELLED 이력을 기록합니다.
+- DELETE /api/posts/mine/{id}/attachments/{kind}?version={version}: DRAFT/REJECTED의 POSTER/EVIDENCE/ORIGINAL 첨부 제거. 이력에서 참조한 파일은 보존합니다.
+
+삭제는 관리자 내림/복구와 별개입니다. 제거 후 최신 상세를 다시 조회해 version을 갱신해야 합니다.

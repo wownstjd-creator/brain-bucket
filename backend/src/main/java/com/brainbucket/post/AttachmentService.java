@@ -47,9 +47,13 @@ public class AttachmentService {
   }
 
   private Post authorize(String email, Long id, boolean lock, boolean ownerOnly) {
+    return authorize(email, id, lock, ownerOnly, false);
+  }
+
+  private Post authorize(String email, Long id, boolean lock, boolean ownerOnly, boolean history) {
     var u = user(email);
     var p =
-        (lock ? posts.findForReview(id) : posts.findByIdAndDeletedAtIsNull(id))
+        (lock ? posts.findForReview(id) : history ? posts.findById(id) : posts.findByIdAndDeletedAtIsNull(id))
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     if (!p.getAuthor().getId().equals(u.getId()) && (ownerOnly || !"ADMIN".equals(u.getRole())))
       throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -104,6 +108,30 @@ public class AttachmentService {
         "/api/posts/mine/" + id + "/attachments/" + k.toLowerCase(Locale.ROOT));
   }
 
+  public void remove(String email, Long id, String k, Long version) {
+    k=kind(k);
+    var p=authorize(email,id,true,true);
+    PostRules.version(p,version);
+    if(p.getStatus()!=PostStatus.DRAFT && p.getStatus()!=PostStatus.REJECTED)
+      throw new ResponseStatusException(HttpStatus.CONFLICT,"작성 중이거나 반려된 글의 첨부만 제거할 수 있습니다.");
+    var file=files.findByPost_IdAndFileKind(id,k);
+    if(file.isEmpty()) return;
+    String key=file.get().getStorageKey();
+    boolean preserved=logs.countFileReferences(key)>0;
+    files.delete(file.get());
+    files.flush();
+    p.touchFiles();
+    posts.flush();
+    if(!preserved) TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronization() {
+          public void afterCommit() {
+            try { storage.deleteStored(key); }
+            catch(IOException e) { org.slf4j.LoggerFactory.getLogger(AttachmentService.class)
+                .error("첨부 정리 실패 {}",key,e); }
+          }
+        });
+  }
+
   @Transactional(readOnly = true)
   public PosterService.PosterDownload get(String email, Long id, String k) {
     authorize(email, id, false, false);
@@ -117,7 +145,7 @@ public class AttachmentService {
 
   @Transactional(readOnly = true)
   public List<History> history(String email, Long id) {
-    authorize(email, id, false, false);
+    authorize(email, id, false, false, true);
     return logs.findByPost_IdOrderByCreatedAtDescIdDesc(id).stream()
         .map(
             l ->
@@ -147,7 +175,7 @@ public class AttachmentService {
 
   @Transactional(readOnly = true)
   public PosterService.PosterDownload historical(String email, Long id, Long logId, String kind) {
-    authorize(email, id, false, false);
+    authorize(email, id, false, false, true);
     var l =
         logs.findById(logId)
             .filter(v -> v.getPost().getId().equals(id))

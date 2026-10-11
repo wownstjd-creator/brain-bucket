@@ -270,6 +270,12 @@ public class Post {
         + displayUntil;
   }
 
+  public void cancelApproval() { status = PostStatus.DRAFT; }
+
+  public void deleteByAuthor() {
+    deletedAt = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+  }
+
   public void touchFiles() {
     updatedAt = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
   }

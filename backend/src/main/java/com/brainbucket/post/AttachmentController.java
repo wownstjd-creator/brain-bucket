@@ -26,6 +26,13 @@ public class AttachmentController {
     return s.save(a.getName(), id, kind, file, version);
   }
 
+  @DeleteMapping("/attachments/{kind}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void remove(Authentication auth, @PathVariable Long id, @PathVariable String kind,
+      @RequestParam Long version) {
+    s.remove(auth.getName(), id, kind, version);
+  }
+
   @GetMapping("/attachments/{kind}")
   public ResponseEntity<Resource> get(
       Authentication a, @PathVariable Long id, @PathVariable String kind) {

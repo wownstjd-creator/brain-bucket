@@ -19,6 +19,7 @@ export default function PosterCapture({editPost}:{editPost?:BoardPost}) {
   const [confidence,setConfidence]=useState<number|null>(null),[localNotice,setLocalNotice]=useState('');
   const stage=useRef<HTMLDivElement>(null),form=useRef<HTMLFormElement>(null),worker=useRef<Worker|null>(null),generation=useRef(0),draftId=useRef<string|undefined>(editPost?.id),memberId=useRef<number|undefined>(undefined),generated=useRef(new Set<keyof PosterFields>());
   const revision=useRef<number|undefined>(editPost?.version),uploaded=useRef<Record<string,string>>({});
+  const [attachmentStatus,setAttachmentStatus]=useState(editPost?.status||'DRAFT'),[originalRemoved,setOriginalRemoved]=useState(false);
   const [showViewCount,setShowViewCount]=useState(editPost?.showViewCount ?? true);
   const [evidence,setEvidence]=useState(editPost?.evidenceUrl||''),[submitted,setSubmitted]=useState(false);
   useEffect(()=>()=>{generation.current++;void worker.current?.terminate();worker.current=null;},[]);
@@ -31,7 +32,7 @@ export default function PosterCapture({editPost}:{editPost?:BoardPost}) {
   };
   const selectFile=async(file?:File)=>{
     if(!file)return;cancel();const job=++generation.current;setBusy(true);setError('');setProgress('사진을 여는 중…');
-    try{const url=await normalizePhoto(file);if(job!==generation.current)return;setSource(url);setResult('');setPoints(defaultCorners());setRawText('');setConfidence(null);setExtraction({fields:{},evidence:{},warnings:[]});const oldGenerated=new Set(generated.current);generated.current.clear();setFields(old=>{const next={...old};oldGenerated.forEach(key=>{next[key]='';});return next;});setProgress('네 모서리를 전단에 맞춰주세요.');resetReview();}catch(e){if(job===generation.current)setError((e as Error).message);}finally{if(job===generation.current)setBusy(false);}
+    try{const url=await normalizePhoto(file);if(job!==generation.current)return;setOriginalRemoved(false);setSource(url);setResult('');setPoints(defaultCorners());setRawText('');setConfidence(null);setExtraction({fields:{},evidence:{},warnings:[]});const oldGenerated=new Set(generated.current);generated.current.clear();setFields(old=>{const next={...old};oldGenerated.forEach(key=>{next[key]='';});return next;});setProgress('네 모서리를 전단에 맞춰주세요.');resetReview();}catch(e){if(job===generation.current)setError((e as Error).message);}finally{if(job===generation.current)setBusy(false);}
   };
   const readPoster=async()=>{
     if(!source||!validCorners(points))return;const job=++generation.current;setBusy(true);setError('');resetReview();setProgress('선택한 영역을 반듯하게 펴고 보정하고 있어요…');
@@ -55,13 +56,29 @@ export default function PosterCapture({editPost}:{editPost?:BoardPost}) {
     if(submit&&(!result||!evidence||!fields.postingStart||!fields.postingEnd)){setError('보정한 전단·승인 증빙·게시 시작일과 종료일을 모두 확인해주세요.');return;}
     setSaving(true);setError('');setSaved('');try{
       let response=await api.save({title:fields.title,organizer:fields.organizer,category:fields.category,description:fields.description,location:fields.location,applicationUrl:fields.applicationUrl,eventAt,deadlineAt,showViewCount,postingStart:fields.postingStart||null,postingEnd:fields.postingEnd||null,version:revision.current},draftId.current);
-      draftId.current=response.id;revision.current=response.version;
+      draftId.current=response.id;revision.current=response.version;setAttachmentStatus(response.status);
       for(const [kind,dataUrl] of [['POSTER',result],['ORIGINAL',source],['EVIDENCE',evidence]]){
         if(dataUrl.startsWith('data:')&&uploaded.current[kind]!==dataUrl){response=await api.upload(response.id,kind,dataUrl,revision.current);revision.current=response.version;uploaded.current[kind]=dataUrl;}
       }
       if(submit){response=await api.submit(response.id,revision.current);revision.current=response.version;setSubmitted(true);}
       setSaved(submit?`#${response.id} 승인 요청이 접수됐어요. 담당자가 승인하면 공개됩니다.`:`#${response.id} 사진과 내용을 임시 저장했어요. 아직 공개되지 않았어요.`);
 
+    }catch(e){setError((e as Error).message);}finally{setSaving(false);}
+  };
+  const removeAttachment=async(kind:string)=>{
+    if(!window.confirm('이 첨부를 제거할까요? 처리 이력에 보존된 파일은 유지됩니다.'))return;
+    setSaving(true);setError('');
+    try{
+      if(draftId.current){
+        if(revision.current===undefined)throw new Error('다시 불러온 뒤 시도해주세요.');
+        const response=await api.removeAttachment(draftId.current,kind,revision.current);
+        revision.current=response.version;
+      }
+      delete uploaded.current[kind];
+      if(kind==='EVIDENCE')setEvidence('');
+      if(kind==='POSTER')setResult('');
+      if(kind==='ORIGINAL'){setSource('');setOriginalRemoved(true);setShowOriginal(false);}
+      resetReview();setLocalNotice('첨부를 제거했어요.');
     }catch(e){setError((e as Error).message);}finally{setSaving(false);}
   };
   const selectEvidence=async(file?:File)=>{if(!file)return;setBusy(true);setError('');try{setEvidence(await normalizePhoto(file));resetReview();}catch(e){setError((e as Error).message);}finally{setBusy(false);}};
@@ -73,7 +90,7 @@ export default function PosterCapture({editPost}:{editPost?:BoardPost}) {
     <div className="capture-layout"><section className="photo-column" aria-label="사진 선택 및 보정"><div className="source-actions"><label className="primary">파일 선택<input className="sr-only" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy||saving||submitted} onChange={e=>{void selectFile(e.target.files?.[0]);e.target.value='';}}/></label><label className="secondary">사진 촬영<input className="sr-only" type="file" accept="image/*" capture="environment" disabled={busy||saving||submitted} onChange={e=>{void selectFile(e.target.files?.[0]);e.target.value='';}}/></label></div><p className="demo-note">JPG·PNG·WebP, 최대 20MB. 촬영은 지원하는 휴대폰에서 카메라를 열어요.</p>
       {!source&&!result&&<div className="capture-placeholder"><span>▧</span><h2>게시할 전단을 선택해주세요</h2><p>전단 전체가 잘 보이도록 찍으면<br/>글자를 더 정확하게 읽을 수 있어요.</p></div>}
       {(source||result)&&<><div className="crop-heading"><strong>{result?'보정한 전단':'네 모서리를 전단에 맞춰주세요'}</strong><button type="button" className="text-button" disabled={busy||saving||submitted} onClick={()=>{if(source){setResult('');setPoints(defaultCorners());resetReview();}else{setProgress('영역을 바꾸려면 사진을 다시 선택해주세요.');}}}>영역 다시 선택</button></div>
-        {result?<><img className="corrected-photo" src={showOriginal?(source||editPost?.originalUrl):result} alt={showOriginal?'보정 전 원본 사진':'영역 및 밝기를 보정한 전단'}/><div className="source-actions"><button className="secondary" disabled={!source&&!editPost?.originalUrl} onClick={()=>setShowOriginal(!showOriginal)}>{showOriginal?'보정본 보기':'원본과 비교'}</button><button className="secondary" onClick={download}>보정본 다운로드</button></div></>:<div className="crop-stage" ref={stage}><img src={source} alt="모서리 조정 대상 전단 사진" draggable={false}/><svg className="crop-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon points={points.map(p=>`${p.x*100},${p.y*100}`).join(' ')} /></svg>{points.map((point,index)=><button type="button" className="crop-handle" key={index} aria-label={`${cornerNames[index]} 모서리: 드래그 또는 방향키로 조정`} disabled={busy||saving||submitted} style={{left:`${point.x*100}%`,top:`${point.y*100}%`}} onPointerDown={e=>e.currentTarget.setPointerCapture(e.pointerId)} onPointerMove={e=>{if(!e.currentTarget.hasPointerCapture(e.pointerId))return;const rect=stage.current!.getBoundingClientRect();moveCorner(index,(e.clientX-rect.left)/rect.width,(e.clientY-rect.top)/rect.height);}} onPointerUp={e=>{if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId);}} onKeyDown={e=>{const shift=e.shiftKey ? .03 : .005;const delta:Record<string,Point>={ArrowLeft:{x:-shift,y:0},ArrowRight:{x:shift,y:0},ArrowUp:{x:0,y:-shift},ArrowDown:{x:0,y:shift}};if(delta[e.key]){e.preventDefault();moveCorner(index,point.x+delta[e.key].x,point.y+delta[e.key].y);}}}><span>{index+1}</span></button>)}</div>}
+        {result?<><img className="corrected-photo" src={showOriginal?(source||editPost?.originalUrl):result} alt={showOriginal?'보정 전 원본 사진':'영역 및 밝기를 보정한 전단'}/><div className="source-actions"><button className="secondary" disabled={!source&&(!editPost?.originalUrl||originalRemoved)} onClick={()=>setShowOriginal(!showOriginal)}>{showOriginal?'보정본 보기':'원본과 비교'}</button><button className="secondary" onClick={download}>보정본 다운로드</button></div></>:<div className="crop-stage" ref={stage}><img src={source} alt="모서리 조정 대상 전단 사진" draggable={false}/><svg className="crop-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon points={points.map(p=>`${p.x*100},${p.y*100}`).join(' ')} /></svg>{points.map((point,index)=><button type="button" className="crop-handle" key={index} aria-label={`${cornerNames[index]} 모서리: 드래그 또는 방향키로 조정`} disabled={busy||saving||submitted} style={{left:`${point.x*100}%`,top:`${point.y*100}%`}} onPointerDown={e=>e.currentTarget.setPointerCapture(e.pointerId)} onPointerMove={e=>{if(!e.currentTarget.hasPointerCapture(e.pointerId))return;const rect=stage.current!.getBoundingClientRect();moveCorner(index,(e.clientX-rect.left)/rect.width,(e.clientY-rect.top)/rect.height);}} onPointerUp={e=>{if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId);}} onKeyDown={e=>{const shift=e.shiftKey ? .03 : .005;const delta:Record<string,Point>={ArrowLeft:{x:-shift,y:0},ArrowRight:{x:shift,y:0},ArrowUp:{x:0,y:-shift},ArrowDown:{x:0,y:shift}};if(delta[e.key]){e.preventDefault();moveCorner(index,point.x+delta[e.key].x,point.y+delta[e.key].y);}}}><span>{index+1}</span></button>)}</div>}
         {!validCorners(points)&&<p className="error">모서리가 교차했거나 영역이 너무 작아요. 다시 지정해주세요.</p>}
         <label className="check-row"><input type="checkbox" checked={enhance} disabled={busy||saving||submitted} onChange={e=>{setEnhance(e.target.checked);if(source)setResult('');resetReview();}}/>밝기·대비 자동 보정</label><label className="year-setting">연도가 없는 날짜의 기준 연도<input type="number" min={2000} max={2099} value={year} disabled={busy||saving||submitted} onChange={e=>setYear(Number(e.target.value))}/></label>
         <button type="button" className="primary full" disabled={busy||saving||submitted||!source||!validCorners(points)||year<2000||year>2099} onClick={()=>void readPoster()}>{busy?'사진 처리 중…':'자동 보정하고 글자 읽기'}</button>{busy&&<button type="button" className="secondary full" onClick={cancel}>인식 취소</button>}
@@ -90,7 +107,8 @@ export default function PosterCapture({editPost}:{editPost?:BoardPost}) {
         <label className="check-row review-check"><input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/>원본과 비교해 제목·날짜·내용을 확인했어요.</label>
       </fieldset></form>
       <section className="approval-note"><strong>승인 증빙 첨부</strong><p>담당자가 확인할 게시 허가 자료를 이미지로 첨부해주세요. 원본과 증빙은 작성자·담당자만 볼 수 있습니다.</p><input aria-label="승인 증빙 이미지" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy||saving||submitted} onChange={e=>{void selectEvidence(e.target.files?.[0]);e.target.value='';}}/>{evidence&&<img src={evidence} alt="승인 증빙 미리보기" style={{maxHeight:200,marginTop:12}}/>}</section>
-      <AccountPanel onMember={user=>{setMember(user);if(memberId.current!==undefined&&memberId.current!==user?.id){draftId.current=undefined;revision.current=undefined;uploaded.current={};setSaved('');setSubmitted(false);}memberId.current=user?.id;}}/>
+      <section className="approval-note"><strong>첨부 관리</strong><p className="demo-note">작성 중·반려 상태에서 제거할 수 있어요. 승인된 글은 먼저 임시 저장하면 작성 중으로 전환돼요.</p><div className="source-actions">{result&&<button className="secondary" disabled={busy||saving||submitted||!['DRAFT','REJECTED'].includes(attachmentStatus)} onClick={()=>void removeAttachment('POSTER')}>전단 제거</button>}{evidence&&<button className="secondary" disabled={busy||saving||submitted||!['DRAFT','REJECTED'].includes(attachmentStatus)} onClick={()=>void removeAttachment('EVIDENCE')}>증빙 제거</button>}{(source||(!originalRemoved&&editPost?.originalUrl))&&<button className="secondary" disabled={busy||saving||submitted||!['DRAFT','REJECTED'].includes(attachmentStatus)} onClick={()=>void removeAttachment('ORIGINAL')}>원본 제거</button>}</div></section>
+      <AccountPanel onMember={user=>{setMember(user);if(memberId.current!==undefined&&memberId.current!==user?.id){draftId.current=undefined;revision.current=undefined;uploaded.current={};setSaved('');setSubmitted(false);setAttachmentStatus('DRAFT');}memberId.current=user?.id;}}/>
       <div className="publish-limit"><strong>담당자 승인 후 공개됩니다</strong><p>사진·내용을 임시 저장하거나, 확인을 마치고 승인 요청할 수 있어요. 승인된 전단을 수정하면 공개가 중단되고 재승인이 필요해요.</p></div>
       <button type="button" className="secondary full" disabled={!member||saving||busy||submitted} onClick={()=>void save(false)}>{saving?'저장 중…':'임시 저장'}</button><button type="button" className="primary full publish-button" disabled={!member||!confirmed||saving||busy||submitted} onClick={()=>void save(true)}>{submitted?'승인 요청 완료':'게시하기 · 승인 요청'}</button>
       {submitted&&<a className="secondary full" href="#/mine">내 대자보에서 확인하기</a>}

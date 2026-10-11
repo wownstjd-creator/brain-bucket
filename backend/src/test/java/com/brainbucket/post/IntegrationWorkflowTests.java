@@ -29,6 +29,7 @@ class IntegrationWorkflowTests {
   @Autowired JdbcTemplate db;
   @Autowired BookmarkService bookmarks;
   @Autowired PosterService posters;
+  @Autowired PostLifecycleService lifecycle;
   private LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 
   private CreatePostRequest draft(LocalDate start, LocalDate end, Long version) {
@@ -175,4 +176,39 @@ class IntegrationWorkflowTests {
     bookmarks.remove("owner@example.com", id);
     assertTrue(bookmarks.ids("owner@example.com").isEmpty());
   }
+  @Test
+  void authorLifecyclePreservesHistoryAndEnforcesOwnership() throws Exception {
+    String owner="lifecycle@example.com", other="lifecycle-other@example.com";
+    users.saveAndFlush(new User(owner,"hash","owner"));
+    users.saveAndFlush(new User(other,"hash","other"));
+    Long id=drafts.createDraft(owner,draft(today,today.plusDays(30),null)).id();
+    files.save(owner,id,"POSTER",image(0xff0011),null);
+    files.save(owner,id,"EVIDENCE",image(0x00ff11),null);
+    approval.requestApproval(owner,id);
+    long version=drafts.getMyPost(owner,id).version();
+    status(409,()->files.remove(owner,id,"EVIDENCE",version));
+    status(404,()->lifecycle.change(other,id,version,false));
+    status(409,()->lifecycle.change(owner,id,version-1,false));
+    lifecycle.change(owner,id,version,false);
+    assertEquals(PostStatus.DRAFT,posts.findById(id).orElseThrow().getStatus());
+    var history=files.history(owner,id).stream().filter(h->h.decision().equals("REQUEST_CANCELLED")).findFirst().orElseThrow();
+    byte[] evidence=files.historical(owner,id,history.id(),"EVIDENCE").resource().getInputStream().readAllBytes();
+    long next=drafts.getMyPost(owner,id).version();
+    status(409,()->lifecycle.change(owner,id,next,false));
+    status(404,()->files.remove(other,id,"EVIDENCE",next));
+    files.remove(owner,id,"EVIDENCE",next);
+    status(404,()->files.get(owner,id,"EVIDENCE"));
+    assertArrayEquals(evidence,files.historical(owner,id,history.id(),"EVIDENCE").resource().getInputStream().readAllBytes());
+    status(409,()->lifecycle.change(owner,id,next,true));
+    long current=drafts.getMyPost(owner,id).version();
+    status(404,()->lifecycle.change(other,id,current,true));
+    lifecycle.change(owner,id,current,true);
+    status(404,()->drafts.getMyPost(owner,id));
+    status(404,()->files.get(owner,id,"POSTER"));
+    status(404,()->published.getDetail(id));
+    status(404,()->files.history(other,id));
+    assertTrue(files.history(owner,id).stream().anyMatch(h->h.decision().equals("DELETED")));
+    assertArrayEquals(evidence,files.historical(owner,id,history.id(),"EVIDENCE").resource().getInputStream().readAllBytes());
+  }
+
 }
