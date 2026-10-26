@@ -1,0 +1,16 @@
+.app-header .jjabo-brand{display:inline-flex;align-items:center;gap:7px;min-height:52px;color:#294c3a;text-decoration:none;letter-spacing:0;flex-shrink:0}
+.jjabo-mark{display:block;width:42px;height:46px;flex:none;transform:rotate(-5deg)}
+.jjabo-wordmark{position:relative;isolation:isolate;font-size:29px;font-weight:900;line-height:1.2;letter-spacing:-1.8px;padding:0 3px 3px 0;white-space:nowrap}
+.jjabo-underline{position:absolute;z-index:-1;left:0;right:0;bottom:4px;height:7px;background:#edc65d;transform:rotate(-3deg);border-radius:2px 5px 3px 2px}
+.jjabo-caption{font-size:9px;font-weight:500;line-height:1.5;letter-spacing:-.15px;color:#6b7566;margin-left:4px;padding-left:10px;border-left:1px solid #d8d9cb;white-space:nowrap}
+.jjabo-brand:focus-visible{outline:2px solid #345844;outline-offset:3px;border-radius:5px}
+@media(max-width:350px){.jjabo-caption{display:none}.jjabo-wordmark{font-size:27px}.jjabo-mark{width:38px;height:42px}}
+
+.app-header .header-actions{gap:8px;flex-shrink:0}
+.header-account{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:78px;min-height:48px;padding:3px 2px;color:#52634f;text-decoration:none;font-size:10px;font-weight:500;line-height:1.3;white-space:nowrap}
+.header-account-icon{display:grid;place-items:center;width:26px;height:26px;border-radius:9px;background:#e9ecdf;border:1px solid #dce2d2}
+.header-account-icon svg{display:block;width:18px;height:18px;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+.header-account[aria-current=page] .header-account-icon{background:#345844;color:#fff;border-color:#345844}
+.header-account:focus-visible{outline:2px solid #345844;outline-offset:2px;border-radius:6px}
+@media(hover:hover){.header-account:hover .header-account-icon{background:#dce4cf}}
+@media(max-width:420px){.jjabo-caption{display:none}.app-header .header-actions{gap:3px}}

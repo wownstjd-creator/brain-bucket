@@ -1,3 +1,4 @@
+import Brand from './Brand';
 import {useEffect,useState} from 'react';
 import {type BoardPost} from './types';
 import Upload from './capture/PosterCapture';
@@ -31,8 +32,8 @@ export default function App(){
  useEffect(()=>{let active=true;setLoading(true);setError('');setPost(null);setItems([]);void api.me().then(m=>{if(active)setMember(m);}).catch(()=>{if(active)setMember(null);});
  const load=async()=>{try{if(mine||admin){const path=mine?`/api/posts/mine/cards?page=${page}&size=20`:`/api/admin/posts/cards?status=${adminFilter}&page=${page}&size=20`;const data=await request<BoardPost[]>(path);if(active)setItems(data);}else if(edit||detail){const id=route.split('/')[2];const data=await request<BoardPost>(edit||privateView?`/api/posts/mine/${id}`:`/api/public/posts/${id}`);if(active)setPost(data);if(!edit&&!privateView)void request<{viewCount:number|null}>(`/api/posts/public/${id}/view`,'POST').then(v=>{if(active)setPost({...data,viewCount:v.viewCount});}).catch(()=>{});}}catch(e){if(active)setError((e as Error).message);}finally{if(active)setLoading(false);}};void load();return()=>{active=false;};},[route,refresh,page,adminFilter]);
 
- return <div className={`app-shell ${route==='/upload'||edit?'capture-shell':''}`}><header className="app-header"><a className="logo" href="#/board"><span className="brand-dot"/>한눈에</a><div className="header-actions"><button aria-label="내 메뉴" aria-expanded={menu} onClick={()=>setMenu(!menu)}>☰</button></div></header>
- {menu&&<nav className="reserve-menu"><a href="#/board">대자보</a><a href="#/archive">지난 전단</a><a href="#/upload">게시하기</a><a href="#/mine">내 대자보</a><a href="#/saved">스크랩</a><a href="#/demo">시연 보기</a>{member?.role==='ADMIN'&&<a href="#/admin">게시물 관리</a>}<a href="#/login">{member?`${member.displayName} · 계정`:'로그인 / 회원가입'}</a></nav>}
+ return <div className={`app-shell ${route==='/upload'||edit?'capture-shell':''}`}><header className="app-header"><Brand/><div className="header-actions"><a className="header-account" href="#/login" aria-label={member?'내 계정':'로그인 또는 회원가입'} aria-current={route==='/login'?'page':undefined} onClick={()=>setMenu(false)}><span className="header-account-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.25"/><path d="M5.5 20v-1.5a6.5 6.5 0 0 1 13 0V20"/></svg></span><span>{member?'내 계정':'로그인 · 회원가입'}</span></a><button aria-label="게시판 메뉴" aria-expanded={menu} onClick={()=>setMenu(!menu)}>☰</button></div></header>
+ {menu&&<nav className="reserve-menu"><a href="#/board">대자보</a><a href="#/archive">지난 전단</a><a href="#/upload">게시하기</a><a href="#/mine">내 대자보</a><a href="#/saved">스크랩</a><a href="#/demo">시연 보기</a>{member?.role==='ADMIN'&&<a href="#/admin">게시물 관리</a>}</nav>}
  {error&&<div className="form-page"><p role="alert" className="error">{error}</p><a className="secondary" href="#/login">로그인</a><button className="secondary" onClick={()=>setRefresh(v=>v+1)}>다시 불러오기</button></div>}
  {loading&&<p role="status" className="empty-state">불러오는 중…</p>}
  {!loading&&!error&&wall&&<BoardExperience route={route}/>}
