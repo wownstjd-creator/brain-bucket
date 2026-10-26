@@ -1,0 +1,15 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> brain-bucket-frontend@0.1.0 build
+> tsc --noEmit && vite build
+
+vite v8.0.13 building client environment for production...
+[2Ktransforming...✓ 57 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                       0.67 kB │ gzip:  0.45 kB
+dist/assets/worker.min-B9Bty8gg.js  111.16 kB
+dist/assets/index-BVmtcbnZ.css       26.47 kB │ gzip:  6.67 kB
+dist/assets/index-YHW9Dblv.js       267.72 kB │ gzip: 85.42 kB
+
+✓ built in 209ms

@@ -1,12 +1,16 @@
-# 친구에게 공유할 변경
+# 팀 개발과 폴더 역할 — 2026-10-26
 
-최종 백엔드 기준은 MySQL main입니다. 친구 frontend를 함께 가져왔고 API 어댑터를 변경했습니다. 화면 디자인·보정·OCR은 유지했습니다.
+기준은 이번 main ZIP의 MySQL 백엔드와 React 프론트입니다. 다른 예비본의 H2 엔티티·자동 관리자 계정 생성 코드를 섞지 않습니다.
 
-- frontend/src/capture/api.ts: 한글 분류→기존 코드, postingStart/End→displayFrom/Until, Base64→Blob/FormData, 기존 승인·공개 주소, 관리자 상세 응답 변환, 전체 목록 페이지 조회.
-- App.tsx: 새 역사 이미지 URL, 관리자 상태 조회, 조회수 표시.
-- BoardExperience.tsx: MySQL 계정 스크랩 연결, 전단 열기 조회수 호출.
-- vite.config.ts: 8080 개발 프록시.
+- 화면·HTTP API 호출: frontend/src. api.ts의 필드명/경로 변환은 프론트 책임입니다.
+- DB·인증·권한·API: backend/src. SQL/Java 마이그레이션과 DB 접속 설정도 이곳에서 관리합니다.
+- frontend/backend·frontend/scripts·frontend/compose.yaml·frontend/docs는 중복을 제거하고 루트 backend/scripts/compose.yaml/docs로 통합했습니다.
+- backend/static은 빌드된 화면, runtime은 빌드된 실행 파일입니다. 소스를 수정한 후 루트 scripts/build.ps1로 함께 갱신합니다.
 
-이 통합본의 frontend와 backend를 함께 사용하세요. 친구의 H2용 backend/data/관리자 계정을 main에 덮어쓰지 않습니다. 프론트 기능 검증과 실제 MySQL 검증이 완료된 뒤 통합 브랜치를 main에 합칩니다.
+이미 최초 환경 준비를 마친 팀원은 pull 후 서버를 종료하고 `2-start.cmd`로 재시작합니다. pull만으로 실행 중인 서버가 바뀌지는 않습니다. 최초 한 번 Java21 이상·MySQL8·개인 .env 설정이 필요합니다. Git은 계정 데이터나 uploads를 공유하지 않습니다.
 
-이 작업에서 실제 GitHub 커밋/푸시는 수행하지 않았습니다. 커밋 예: feat: MySQL 기반 전단 게시 관리 및 프론트 통합
+이번 ZIP을 기존 저장소에 처음 적용할 때는 APPLY-FINAL.md를 따릅니다. 적용 스크립트가 덮어쓰기와 중복 파일 삭제를 함께 처리하며 기존 Git 연결·DB·업로드를 유지합니다.
+
+이번 변경은 승인/반려 version 필수 검사, 승인 요청 version 전달, 포스터 조회 잠금 제거, 두 배포 DB 이력 호환 선택, 개발용 사용자 수 API 제거입니다. API 요청 규격은 api.md, DB 파일 위치와 이력 정책은 database.md, 검증 결과는 verification.md를 참고하세요.
+
+GitHub 커밋·푸시는 사용자가 수행합니다. Summary: `fix: 프론트·백엔드 구조 정리 및 승인 버전·DB 이력 호환성 수정`.

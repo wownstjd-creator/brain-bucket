@@ -16,8 +16,8 @@ public class PostApprovalController {
 
   @PostMapping("/{postId}/approval-request")
   public CreatePostResponse requestApproval(
-      Authentication authentication, @PathVariable Long postId) {
-    return postApprovalService.requestApproval(authentication.getName(), postId);
+      Authentication authentication, @PathVariable Long postId, @RequestParam(required = false) Long version) {
+    return postApprovalService.requestApproval(authentication.getName(), postId, version);
   }
 
   @GetMapping("/{postId}/approval-logs")

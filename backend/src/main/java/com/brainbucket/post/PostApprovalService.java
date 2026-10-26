@@ -37,6 +37,11 @@ public class PostApprovalService {
 
   @Transactional
   public CreatePostResponse requestApproval(String email, Long postId) {
+    return requestApproval(email, postId, null);
+  }
+
+  @Transactional
+  public CreatePostResponse requestApproval(String email, Long postId, Long version) {
     var author =
         userRepository
             .findByEmail(email)
@@ -47,6 +52,8 @@ public class PostApprovalService {
             .findForReview(postId)
             .filter(value -> value.getAuthor().getId().equals(author.getId()))
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+    PostRules.version(post, version);
 
     if (post.getStatus() != PostStatus.DRAFT && post.getStatus() != PostStatus.REJECTED) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "작성 중이거나 반려된 게시물만 승인 요청할 수 있습니다.");

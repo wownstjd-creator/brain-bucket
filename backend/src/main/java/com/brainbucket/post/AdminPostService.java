@@ -32,9 +32,11 @@ public class AdminPostService {
   }
 
   @Transactional
-  public CreatePostResponse approve(String email, Long postId) {
+  public CreatePostResponse approve(String email, Long postId, Long version) {
     User reviewer = requireAdmin(email);
     Post post = requirePendingPost(postId);
+    if (version == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "검토한 게시물 버전이 필요합니다.");
+    PostRules.version(post, version);
 
     LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 
@@ -65,7 +67,7 @@ public class AdminPostService {
   }
 
   @Transactional
-  public CreatePostResponse reject(String email, Long postId, String reason) {
+  public CreatePostResponse reject(String email, Long postId, String reason, Long version) {
     User reviewer = requireAdmin(email);
 
     if (reason == null || reason.isBlank() || reason.length() > 2000) {
@@ -74,6 +76,8 @@ public class AdminPostService {
     }
 
     Post post = requirePendingPost(postId);
+    if (version == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "검토한 게시물 버전이 필요합니다.");
+    PostRules.version(post, version);
 
     post.reject();
 

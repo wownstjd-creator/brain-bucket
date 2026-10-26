@@ -12,7 +12,7 @@ export async function request<T>(path:string,method='GET',body?:unknown):Promise
     if(path.startsWith('/api/public/posts'))actual=path.replace('/api/public/posts','/api/posts/public');
     if(path.includes('/history'))actual=path.replace(/\/api\/posts\/(\d+)\/history/, '/api/posts/mine/$1/history');
     if(path==='/api/admin/posts?status=ALL')actual='/api/admin/posts/managed?status=ALL&size=50';
-    if(path.endsWith('/review')) {const r=body as {decision:string;reason:string};actual=path.replace('/review',r.decision==='APPROVED'?'/approve':'/reject');body=r.decision==='APPROVED'?undefined:{reason:r.reason};}
+    if(path.endsWith('/review')) {const r=body as {decision:string;reason:string;version:number};actual=path.replace('/review',r.decision==='APPROVED'?'/approve':'/reject');body=r.decision==='APPROVED'?{version:r.version}:{reason:r.reason,version:r.version};}
     if(path.endsWith('/schedule')) {const r=body as Record<string,unknown>;body={...r,displayFrom:r.postingStart,displayUntil:r.postingEnd};}
     privateView=actual.startsWith('/api/posts/mine')||actual.startsWith('/api/admin/posts/cards');
     const headers:Record<string,string>={};
@@ -47,7 +47,7 @@ export const api={
     await request(`/api/posts/mine/${id}/attachments/${kind.toLowerCase()}?version=${version}`,'DELETE');
     return request<DraftResult>(`/api/posts/mine/${id}`);
   },
-  submit:async(id:string,_version?:number)=>{await request(`/api/posts/mine/${id}/approval-request`,'POST');return request<DraftResult>(`/api/posts/mine/${id}`);},
+  submit:async(id:string,version?:number)=>{await request(`/api/posts/mine/${id}/approval-request${version===undefined?'':`?version=${version}`}`,'POST');return request<DraftResult>(`/api/posts/mine/${id}`);},
   save:async(input:DraftInput,id?:string)=>{const result=await request<{id:number}>(id?`/api/posts/mine/${id}`:'/api/posts',id?'PUT':'POST',{...input,applicationUrl:optionalUrl(input.applicationUrl),category:categoryCodes[input.category]||input.category,displayFrom:input.postingStart,displayUntil:input.postingEnd});return request<DraftResult>(`/api/posts/mine/${result.id}`);},
 };
 const categoryCodes:Record<string,string>={'동아리':'CLUB','대회':'CONTEST','행사':'EVENT','공지':'NOTICE','기타':'OTHER'};

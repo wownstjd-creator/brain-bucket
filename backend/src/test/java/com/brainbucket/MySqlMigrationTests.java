@@ -33,7 +33,7 @@ class MySqlMigrationTests {
           if (!scenario.equals("empty")) {
             try (Connection connection = DriverManager.getConnection(url, user, password)) {
               String schema;
-              try (var stream = getClass().getResourceAsStream("/db/migration/V1__initial_schema.sql")) {
+              try (var stream = getClass().getResourceAsStream("/db/current/V1__initial_schema.sql")) {
                 schema = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
               }
               for (String sql : schema.split(";")) if (!sql.isBlank()) execute(connection, sql);
@@ -70,12 +70,49 @@ class MySqlMigrationTests {
               }
             }
           }
-          var flyway = Flyway.configure().dataSource(url,user,password).baselineOnMigrate(true)
-              .baselineVersion("1").cleanDisabled(true).load();
+          var configuration = Flyway.configure().dataSource(url,user,password).baselineOnMigrate(true)
+              .baselineVersion("1").cleanDisabled(true);
+          com.brainbucket.config.MigrationCompatibilityConfig.configure(configuration);
+          var flyway = configuration.load();
           assertEquals(0, flyway.migrate().migrationsExecuted, scenario + " restart must be a no-op");
         } finally {
           execute(server, "DROP DATABASE `" + database + "`");
         }
+      }
+    }
+  }
+
+  @Test
+  void bothPublishedMigrationHistoriesStartWithoutRewritingHistory() throws Exception {
+    String base=System.getenv("BB_MIGRATION_TEST_URL");
+    if (!base.matches("jdbc:mysql://[^/?]+/?")) throw new IllegalArgumentException("Use a server-only disposable MySQL URL");
+    if (!base.endsWith("/")) base+="/";
+    String user=System.getenv().getOrDefault("BB_MIGRATION_TEST_USER","root");
+    String password=System.getenv().getOrDefault("BB_MIGRATION_TEST_PASSWORD","");
+    try (var server=DriverManager.getConnection(base,user,password)) {
+      for (boolean legacy : new boolean[]{false,true}) {
+        String database="bb_migration_"+UUID.randomUUID().toString().replace("-","");
+        execute(server,"CREATE DATABASE `"+database+"` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+        try {
+          String url=base+database;
+          Flyway.configure().dataSource(url,user,password)
+              .locations(legacy ? "classpath:db/legacy" : "classpath:db/current")
+              .javaMigrations(legacy ? new db.migration.V2__integrate_post_management() : new db.migration.V2__complete_existing_schema())
+              .load().migrate();
+          try (var c=DriverManager.getConnection(url,user,password)) {
+            execute(c,"INSERT INTO users(email,password_hash,display_name) VALUES ('keep@example.com','hash','Keep')");
+          }
+          try (var app=new SpringApplicationBuilder(BrainBucketBackendApplication.class).run(
+              "--spring.datasource.url="+url,"--spring.datasource.username="+user,
+              "--spring.datasource.password="+password,"--server.port=0","--spring.jpa.hibernate.ddl-auto=validate")) {
+            assertTrue(app.getBean(Flyway.class).validateWithResult().validationSuccessful);
+            try (var c=app.getBean(DataSource.class).getConnection()) {
+              assertEquals(1,scalar(c,"SELECT COUNT(*) FROM users WHERE email='keep@example.com'"));
+              assertEquals(legacy ? "integrate post management" : "complete existing schema",
+                  value(c,"SELECT description FROM flyway_schema_history WHERE version='2'"));
+            }
+          }
+        } finally { execute(server,"DROP DATABASE `"+database+"`"); }
       }
     }
   }

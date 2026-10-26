@@ -62,8 +62,8 @@ kind는 poster/evidence/original, multipart file 필드. JPG/PNG 10MB 이하, �
 | GET | /api/posts/mine/{id}/approval-logs | 기존 결정·사유·시각 이력 |
 | GET | /api/posts/mine/{id}/history | 스냅샷·담당자명·당시 파일 URL 포함 이력, 본인/ADMIN |
 | GET | /api/posts/mine/{id}/history/{logId}/{kind} | 본인/ADMIN 당시 파일 |
-| POST | /api/admin/posts/{id}/approve | ADMIN 승인, 본문 없음 |
-| POST | /api/admin/posts/{id}/reject | ADMIN 반려, JSON {reason} |
+| POST | /api/admin/posts/{id}/approve | ADMIN 승인, JSON {version} 필수 |
+| POST | /api/admin/posts/{id}/reject | ADMIN 반려, JSON {reason,version} 필수 |
 
 요청은 DRAFT/REJECTED만, title·organizer·유효 category(CLUB/CONTEST/EVENT/NOTICE/OTHER)·오늘 이후 종료일·포스터와 증빙 실제 파일 필수. 누락400, 파일 없음404. APPROVED/HIDDEN/PENDING 요청409. 승인은 PENDING만 처리, 종료일 및 이미지/증빙 검증 후 APPROVED. 반려 사유1~2000자. 상태 변경은 행 잠금 적용. 수정·재요청 후 과거 이력 유지.
 
@@ -158,3 +158,12 @@ UPDATE users SET role='ADMIN' WHERE email='본인_테스트_관리자_이메일'
 | POST /api/auth/password | currentPassword/newPassword JSON, 성공 204·현재 세션 종료 | 로그인+CSRF |
 
 page>=0, size=1~50. 화면 기본 20개. 목록 배열을 받은 프론트가 다음 페이지를 자동으로 끝까지 수집하지 않습니다. 조건 변경은 첫 페이지로 돌아갑니다. category 값은 CLUB/CONTEST/EVENT/NOTICE/OTHER입니다. 검색의 %/_는 와일드카드가 아닌 문자로 처리합니다. 잘못된 현재 비밀번호/새 비밀번호는 400, 미로그인은 401, CSRF 누락은 403입니다. 변경 후 새 CSRF 토큰을 받아 새 비밀번호로 로그인합니다. 다른 기기의 기존 세션은 유지됩니다.
+
+
+## 2026-10-26 승인 버전 검사
+
+관리자 목록/상세의 `version`은 실제로 검토한 값으로 보관합니다. 승인 시 `POST /api/admin/posts/{id}/approve`에 `{"version":3}`을, 반려 시 `POST /api/admin/posts/{id}/reject`에 `{"reason":"수정 사유","version":3}`을 JSON으로 전송합니다. 버전 누락·음수는 400, 현재 DB 버전과 다르면 409입니다. 새 버전을 클릭 직전에 자동 조회하여 승인하지 말고 변경된 내용을 다시 검토하세요. 프론트 검토 카드에 최신 내용 다시 불러오기 버튼을 추가했습니다.
+
+작성자 승인 요청 `POST /api/posts/mine/{id}/approval-request?version=3`도 전달된 버전을 검사합니다. 기존 본문 없는 승인 요청 API 호환을 위해 이 쿼리 값은 선택이지만 현재 프론트는 저장 직후 받은 version을 전달합니다.
+
+회원가입은 유지되며 `/api/dev/users/count`는 제거되었습니다.

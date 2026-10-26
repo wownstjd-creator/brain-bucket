@@ -115,7 +115,7 @@ public class PosterService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
 
     postRepository
-        .findForReview(postId)
+        .findByIdAndAuthor_IdAndDeletedAtIsNull(postId, author.getId())
         .filter(p -> p.getAuthor().getId().equals(author.getId()))
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 

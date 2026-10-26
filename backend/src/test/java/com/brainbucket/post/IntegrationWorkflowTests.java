@@ -87,7 +87,7 @@ class IntegrationWorkflowTests {
                 "POSTER",
                 new MockMultipartFile("file", new byte[] {1}),
                 null));
-    reviews.approve("reviewer@example.com", id);
+    reviews.approve("reviewer@example.com", id, posts.findById(id).orElseThrow().getVersion());
     assertTrue(published.getPosts(false, 0, 20, "Recruit", null, null).isEmpty());
     status(404, () -> published.getDetail(id));
     status(404, () -> published.getPoster(id));
@@ -160,9 +160,9 @@ class IntegrationWorkflowTests {
                 id,
                 new ScheduleRequest(today.plusDays(10), today, null, null, "invalid", null)));
     approval.requestApproval("owner@example.com", id);
-    reviews.reject("reviewer@example.com", id, "fix");
+    reviews.reject("reviewer@example.com", id, "fix", posts.findById(id).orElseThrow().getVersion());
     approval.requestApproval("owner@example.com", id);
-    reviews.approve("reviewer@example.com", id);
+    reviews.approve("reviewer@example.com", id, posts.findById(id).orElseThrow().getVersion());
     db.execute(
         "create table if not exists bookmarks(user_id bigint not null,post_id bigint not"
             + " null,created_at timestamp not null,primary key(user_id,post_id))");
@@ -223,7 +223,7 @@ class IntegrationWorkflowTests {
       Long id=drafts.createDraft(owner,input).id();ids.add(id);
       files.save(owner,id,"POSTER",image(0x010101+i),null);
       files.save(owner,id,"EVIDENCE",image(0x020202+i),null);
-      approval.requestApproval(owner,id);reviews.approve(admin,id);bookmarks.save(owner,id);
+      approval.requestApproval(owner,id);reviews.approve(admin,id,posts.findById(id).orElseThrow().getVersion());bookmarks.save(owner,id);
     }
     var first=published.getPosts(false,0,20,"PageNeedle_","CLUB",today.plusDays(20).getYear());
     var second=published.getPosts(false,1,20,"PageNeedle_","CLUB",null);

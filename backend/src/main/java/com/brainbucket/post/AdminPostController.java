@@ -15,8 +15,9 @@ public class AdminPostController {
   }
 
   @PostMapping("/{postId}/approve")
-  public CreatePostResponse approve(Authentication authentication, @PathVariable Long postId) {
-    return adminPostService.approve(authentication.getName(), postId);
+  public CreatePostResponse approve(Authentication authentication, @PathVariable Long postId,
+      @Valid @RequestBody ReviewVersionRequest request) {
+    return adminPostService.approve(authentication.getName(), postId, request.version());
   }
 
   @PostMapping("/{postId}/reject")
@@ -24,6 +25,6 @@ public class AdminPostController {
       Authentication authentication,
       @PathVariable Long postId,
       @Valid @RequestBody RejectPostRequest request) {
-    return adminPostService.reject(authentication.getName(), postId, request.reason());
+    return adminPostService.reject(authentication.getName(), postId, request.reason(), request.version());
   }
 }

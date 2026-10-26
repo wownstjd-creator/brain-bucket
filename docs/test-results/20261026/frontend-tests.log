@@ -1,0 +1,34 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> brain-bucket-frontend@0.1.0 test
+> node --experimental-strip-types --test tests/*.test.mjs
+
+✔ draft save obtains CSRF, uses session cookies, and does not retry writes (6.089293ms)
+✔ logout accepts empty 204; next mutation obtains a fresh CSRF token (1.14889ms)
+✔ 401 and empty error bodies produce a readable error (0.705394ms)
+✔ public collection fetches only the requested page and maps backend fields (19.769882ms)
+✔ API error reasons reach the user for both JSON and ProblemDetail responses (1.129697ms)
+✔ password changes use a fresh CSRF token and do not repeat the write (0.598165ms)
+✔ admin cards do not fan out into per-post detail calls (0.895705ms)
+✔ bookmark IDs and archive years retain numeric values (0.405129ms)
+✔ review approval and rejection preserve the revision actually reviewed (0.797109ms)
+✔ approval requests preserve the saved draft revision (0.54065ms)
+✔ Korea midnight moves expired posters into archive even in another time zone (18.833405ms)
+✔ application deadline takes precedence over NEW and posting expiry (0.579047ms)
+✔ NEW uses actual publishing time, never fabricated from start date (0.385901ms)
+✔ saved IDs tolerate corrupt storage and exclude demo or arbitrary paths (1.333384ms)
+✔ event, application deadline and posting dates are separate (2.440072ms)
+✔ missing year is marked and missing time or posting date is not fabricated (0.370619ms)
+✔ invalid dates and unrelated dates do not become event dates (0.182099ms)
+✔ label on preceding line and noon/midnight (0.190662ms)
+✔ quadrilateral corners map accurately and bow ties are rejected (0.599507ms)
+✔ optional dates: absent stays null, date-only events and deadlines use distinct defaults (1.416376ms)
+✔ empty and whitespace application links are null, provided links are trimmed (0.212855ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 267.364829

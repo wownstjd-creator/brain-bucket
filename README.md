@@ -15,6 +15,8 @@
 ## 기술 구성
 
 React·TypeScript 프론트엔드, Spring Boot 백엔드, MySQL 데이터베이스를 사용합니다. 실행에는 Java 21 이상과 MySQL 8이 필요하며, 프론트 개발·재빌드에는 Node 22.18 이상이 필요합니다.
+기존 Git 저장소에 이 ZIP을 적용할 때는 [최종본 적용 안내](APPLY-FINAL.md)를 먼저 읽으세요. 단순 덮어쓰기 대신 적용 스크립트가 중복 파일 삭제까지 처리합니다.
+
 ## 기존 프로젝트에서 업데이트
 
 1. 기존 저장소에서 변경을 커밋한 뒤 최신 코드를 pull합니다.
@@ -52,7 +54,7 @@ Copy-Item .env.example .env
 - 기존 테이블이 있는 DB는 V1 기준선으로 등록하고 V2부터 적용합니다. 이 도입은 이 프로젝트의 기존 MySQL 스키마를 전제로 합니다. 임의의 다른 DB를 접속 대상으로 지정하지 마세요.
 - V2: posts의 display_until·display_from·version, approval_logs의 snapshot·첨부 저장 키·MIME 컬럼 중 없는 컬럼만 추가합니다. 기존 행을 삭제하거나 덮어쓰지 않습니다.
 - 적용 이력은 flyway_schema_history에 남으며 재시작 시 이미 적용된 버전은 건너뜁니다.
-- 자동 실행 파일은 backend/src/main/resources/db/migration과 backend/src/main/java/db/migration에 있습니다. 이후 구조 변경은 새 V3, V4 버전으로 추가하며 이미 배포한 버전은 수정하지 않습니다.
+- SQL은 backend/src/main/resources/db/current와 db/legacy에, Java V2는 backend/src/main/java/db/migration에 있습니다. MigrationCompatibilityConfig가 기존 성공 이력에 맞는 SQL/V2 한 벌만 선택합니다. 두 배포본의 원본은 호환 검증용이므로 수정하지 않습니다. 후속 변경은 새 버전으로 추가하고 호환 선택 설정에도 등록해야 합니다. 자세한 내용은 docs/database.md를 참고하세요.
 - database/schema.sql과 database/migrations/20261010_integrate.sql은 수동 참고 자료입니다. 정상 실행 과정에서 따로 실행하지 않습니다. 기존 DB에 schema.sql을 다시 실행하지 마세요.
 - MySQL DDL은 전체 트랜잭션 롤백이 되지 않습니다. 최초 업데이트 전 DB를 백업하세요. 실패 시 로그의 원인을 해결하고 docs/database.md의 절차를 따릅니다.
 
@@ -78,7 +80,7 @@ backend를 실행한 상태에서 별도 터미널의 frontend 폴더에서 `npm
 - 계정별 MySQL 스크랩, 세션별 조회수, 서버 검색·분류·연도 필터와 20개 단위 페이지 조회.
 - 프론트에서 사진 보정과 브라우저 OCR 지원. 신청 URL·장소·행사/마감은 선택 항목이며 URL 입력 시 http/https 주소를 사용합니다.
 
-UserController.java에는 회원가입 API와 개발용 사용자 수 조회 API(`/api/dev/users/count`)가 있습니다. 개발용 조회 경로의 공개 배포 시 처리 방침은 별도로 정해야 합니다.
+회원가입 API는 유지하고 개발용 사용자 수 조회 API는 제거했습니다. 관리자 승인·반려에는 검토 당시 version이 필수이며 오래된 화면의 처리는 409로 차단됩니다.
 
 ## 데이터와 검증
 

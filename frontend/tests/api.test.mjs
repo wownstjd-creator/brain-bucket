@@ -43,3 +43,18 @@ test('bookmark IDs and archive years retain numeric values',async()=>{
  globalThis.fetch=async()=>response(200,[2026,2025]);
  try{const {request}=await import('../src/capture/api.ts');assert.deepEqual(await request('/api/posts/public/years'),[2026,2025]);}finally{globalThis.fetch=originalFetch;}
 });
+
+test('review approval and rejection preserve the revision actually reviewed',async()=>{
+ const calls=[];globalThis.fetch=async(url,options)=>{calls.push({url,options});return url.endsWith('/csrf')?response(200,{headerName:'X-CSRF-TOKEN',token:'token'}):response(200,{id:7,status:'PENDING'});};
+ try{const {request}=await import('../src/capture/api.ts');
+  await request('/api/admin/posts/7/review','POST',{decision:'APPROVED',reason:'',version:3});
+  await request('/api/admin/posts/7/review','POST',{decision:'REJECTED',reason:'fix',version:7});
+  const writes=calls.filter(c=>c.options.method==='POST');assert.equal(writes.length,2);
+  assert.equal(writes[0].url,'/api/admin/posts/7/approve');assert.deepEqual(JSON.parse(writes[0].options.body),{version:3});
+  assert.equal(writes[1].url,'/api/admin/posts/7/reject');assert.deepEqual(JSON.parse(writes[1].options.body),{reason:'fix',version:7});
+ }finally{globalThis.fetch=originalFetch;}
+});
+test('approval requests preserve the saved draft revision',async()=>{
+ const calls=[];globalThis.fetch=async(url,options)=>{calls.push({url,options});return url.endsWith('/csrf')?response(200,{headerName:'X-CSRF-TOKEN',token:'token'}):response(200,{id:7,status:'PENDING'});};
+ try{await api.submit('7',12);assert.equal(calls[1].url,'/api/posts/mine/7/approval-request?version=12');assert.equal(calls[1].options.method,'POST');}finally{globalThis.fetch=originalFetch;}
+});

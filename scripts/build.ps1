@@ -3,7 +3,7 @@ $projectRoot = Split-Path $PSScriptRoot -Parent
 Push-Location $projectRoot
 try {
     Push-Location frontend
-    try { & npm.cmd ci; if ($LASTEXITCODE -ne 0) { throw 'npm ci failed' }; & npm.cmd run build; if ($LASTEXITCODE -ne 0) { throw 'Frontend build failed' } } finally { Pop-Location }
+    try { & npm.cmd ci; if ($LASTEXITCODE -ne 0) { throw 'npm ci failed' }; & npm.cmd test; if ($LASTEXITCODE -ne 0) { throw 'Frontend tests failed' }; & npm.cmd run build; if ($LASTEXITCODE -ne 0) { throw 'Frontend build failed' } } finally { Pop-Location }
     $staticTarget = Join-Path $projectRoot 'backend/src/main/resources/static'
     $staticTarget = [IO.Path]::GetFullPath($staticTarget)
     $expectedTarget = [IO.Path]::GetFullPath((Join-Path $projectRoot 'backend/src/main/resources/static'))

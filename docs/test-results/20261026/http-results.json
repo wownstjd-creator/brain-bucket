@@ -1,0 +1,598 @@
+{
+  "checks": [
+    {
+      "name": "owner login",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "admin login",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "other login",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "anonymous /",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "anonymous /api/posts/public?archived=false&page=0&size=20",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "anonymous /api/posts/public/years",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "private anonymous /api/auth/me",
+      "status": 401,
+      "expected": 401,
+      "pass": true
+    },
+    {
+      "name": "private anonymous /api/posts/mine/cards",
+      "status": 401,
+      "expected": 401,
+      "pass": true
+    },
+    {
+      "name": "private anonymous /api/admin/posts/cards",
+      "status": 401,
+      "expected": 401,
+      "pass": true
+    },
+    {
+      "name": "private anonymous /api/dev/users/count",
+      "status": 401,
+      "expected": 401,
+      "pass": true
+    },
+    {
+      "name": "nonadmin blocked",
+      "status": 403,
+      "expected": 403,
+      "pass": true
+    },
+    {
+      "name": "CSRF required",
+      "status": 403,
+      "expected": 403,
+      "pass": true
+    },
+    {
+      "name": "invalid query page=-1",
+      "status": 400,
+      "expected": 400,
+      "pass": true
+    },
+    {
+      "name": "invalid query size=0",
+      "status": 400,
+      "expected": 400,
+      "pass": true
+    },
+    {
+      "name": "invalid query size=51",
+      "status": 400,
+      "expected": 400,
+      "pass": true
+    },
+    {
+      "name": "invalid query category=BAD",
+      "status": 400,
+      "expected": 400,
+      "pass": true
+    },
+    {
+      "name": "invalid query year=9999",
+      "status": 400,
+      "expected": 400,
+      "pass": true
+    },
+    {
+      "name": "invalid query search=aaaaaaaaaaaaaaaaaa",
+      "status": 400,
+      "expected": 400,
+      "pass": true
+    },
+    {
+      "name": "draft validation ['applicationUrl']",
+      "status": 400,
+      "expected": 400,
+      "pass": true
+    },
+    {
+      "name": "draft validation ['title']",
+      "status": 400,
+      "expected": 400,
+      "pass": true
+    },
+    {
+      "name": "draft validation ['displayFrom']",
+      "status": 400,
+      "expected": 400,
+      "pass": true
+    },
+    {
+      "name": "create draft",
+      "status": 201,
+      "expected": 201,
+      "pass": true
+    },
+    {
+      "name": "other private detail",
+      "status": 404,
+      "expected": 404,
+      "pass": true
+    },
+    {
+      "name": "draft not public",
+      "status": 404,
+      "expected": 404,
+      "pass": true
+    },
+    {
+      "name": "missing attachment reject",
+      "status": 400,
+      "expected": 400,
+      "pass": true
+    },
+    {
+      "name": "wrong file content",
+      "status": 400,
+      "expected": 400,
+      "pass": true
+    },
+    {
+      "name": "invalid attachment kind",
+      "status": 400,
+      "expected": 400,
+      "pass": true
+    },
+    {
+      "name": "other upload",
+      "status": 404,
+      "expected": 404,
+      "pass": true
+    },
+    {
+      "name": "upload poster",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "upload evidence",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "upload original",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "owner attachment poster",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "admin attachment poster",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "other attachment poster",
+      "status": 404,
+      "expected": 404,
+      "pass": true
+    },
+    {
+      "name": "owner attachment evidence",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "admin attachment evidence",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "other attachment evidence",
+      "status": 404,
+      "expected": 404,
+      "pass": true
+    },
+    {
+      "name": "owner attachment original",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "admin attachment original",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "other attachment original",
+      "status": 404,
+      "expected": 404,
+      "pass": true
+    },
+    {
+      "name": "owner legacy poster",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "stale draft edit",
+      "status": 409,
+      "expected": 409,
+      "pass": true
+    },
+    {
+      "name": "submit",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "pending attachment removal",
+      "status": 409,
+      "expected": 409,
+      "pass": true
+    },
+    {
+      "name": "other cancel",
+      "status": 404,
+      "expected": 404,
+      "pass": true
+    },
+    {
+      "name": "stale cancel",
+      "status": 409,
+      "expected": 409,
+      "pass": true
+    },
+    {
+      "name": "cancel",
+      "status": 204,
+      "expected": 204,
+      "pass": true
+    },
+    {
+      "name": "resubmit",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "approve",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "public detail",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "public poster",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "admin poster",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "view count first",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "view count duplicate",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "same-session views deduplicated",
+      "pass": true
+    },
+    {
+      "name": "bookmark",
+      "status": 204,
+      "expected": 204,
+      "pass": true
+    },
+    {
+      "name": "bookmark repeat",
+      "status": 204,
+      "expected": 204,
+      "pass": true
+    },
+    {
+      "name": "bookmark filter",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "search SQL literal",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "hide",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "hidden poster",
+      "status": 404,
+      "expected": 404,
+      "pass": true
+    },
+    {
+      "name": "restore",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "history",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "edit approved",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "edit hides public",
+      "status": 404,
+      "expected": 404,
+      "pass": true
+    },
+    {
+      "name": "remove original",
+      "status": 204,
+      "expected": 204,
+      "pass": true
+    },
+    {
+      "name": "removed original unavailable",
+      "status": 404,
+      "expected": 404,
+      "pass": true
+    },
+    {
+      "name": "history original retained",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "delete wrong owner",
+      "status": 404,
+      "expected": 404,
+      "pass": true
+    },
+    {
+      "name": "delete owner",
+      "status": 204,
+      "expected": 204,
+      "pass": true
+    },
+    {
+      "name": "deleted private",
+      "status": 404,
+      "expected": 404,
+      "pass": true
+    },
+    {
+      "name": "deleted history",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "create draft",
+      "status": 201,
+      "expected": 201,
+      "pass": true
+    },
+    {
+      "name": "upload poster",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "upload evidence",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "request approval",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "browser fixture approve",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "create draft",
+      "status": 201,
+      "expected": 201,
+      "pass": true
+    },
+    {
+      "name": "upload poster",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "upload evidence",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "request approval",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "race cancel",
+      "status": 204,
+      "expected": 204,
+      "pass": true
+    },
+    {
+      "name": "race edit",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "race resubmit",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "stale review approval blocked",
+      "status": 409,
+      "expected": 409,
+      "pass": true
+    },
+    {
+      "name": "stale review rejection blocked",
+      "status": 409,
+      "expected": 409,
+      "pass": true
+    },
+    {
+      "name": "invalid email",
+      "status": 400,
+      "expected": 400,
+      "pass": true
+    },
+    {
+      "name": "UTF8 password length",
+      "status": 400,
+      "expected": 400,
+      "pass": true
+    },
+    {
+      "name": "duplicate",
+      "status": 409,
+      "expected": 409,
+      "pass": true
+    },
+    {
+      "name": "signup",
+      "status": 201,
+      "expected": 201,
+      "pass": true
+    },
+    {
+      "name": "new member login",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "password incorrect current",
+      "status": 400,
+      "expected": 400,
+      "pass": true
+    },
+    {
+      "name": "password change",
+      "status": 204,
+      "expected": 204,
+      "pass": true
+    },
+    {
+      "name": "password ends session",
+      "status": 401,
+      "expected": 401,
+      "pass": true
+    },
+    {
+      "name": "old password no longer works",
+      "status": 401,
+      "expected": 401,
+      "pass": true
+    },
+    {
+      "name": "new password works",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "oversized attachment",
+      "status": 413,
+      "expected": 413,
+      "pass": true
+    },
+    {
+      "name": "restart persists post",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "name": "restart persists image",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    }
+  ],
+  "findings": [],
+  "browserPostId": 2
+}

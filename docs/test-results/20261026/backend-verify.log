@@ -1,0 +1,413 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------< com.brainbucket:brain-bucket-backend >----------------
+[INFO] Building  0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.5.0:clean (default-clean) @ brain-bucket-backend ---
+[INFO] Deleting /workspace/scratch/4e55d51f15c0/final-20261026/brain-bucket/backend/target
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ brain-bucket-backend ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 13 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ brain-bucket-backend ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 63 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ brain-bucket-backend ---
+[INFO] Copying 2 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ brain-bucket-backend ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 5 source files with javac [debug parameters release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ brain-bucket-backend ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.brainbucket.MySqlMigrationTests
+[WARNING] Tests run: 2, Failures: 0, Errors: 0, Skipped: 2, Time elapsed: 0.011 s -- in com.brainbucket.MySqlMigrationTests
+[INFO] Running com.brainbucket.MigrationCompatibilityTests
+07:56:55.888 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:compat_23ed056c-f035-4f87-9e25-526a8a00c997 (H2 2.4)
+07:56:55.971 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+07:56:55.994 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+07:56:56.020 [main] INFO org.flywaydb.core.FlywayExecutor -- Database: jdbc:h2:mem:compat_23ed056c-f035-4f87-9e25-526a8a00c997 (H2 2.4)
+07:56:56.027 [main] WARN org.flywaydb.core.internal.database.base.Database -- Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+07:56:56.031 [main] INFO org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory -- Creating Schema History table "PUBLIC"."flyway_schema_history" with baseline ...
+07:56:56.061 [main] INFO org.flywaydb.core.internal.command.DbBaseline -- Successfully baselined schema with version: 1
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-26T07:56:56.495-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.a.maven.surefire.booter.ForkedBooter   : Starting ForkedBooter v3.5.6 using Java 21.0.13 with PID 176 (started by root in /workspace/scratch/4e55d51f15c0/final-20261026/brain-bucket/backend)
+2026-10-26T07:56:56.498-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.a.maven.surefire.booter.ForkedBooter   : No active profile set, falling back to 1 default profile: "default"
+2026-10-26T07:56:57.091-04:00  INFO 176 --- [brain-bucket-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-26T07:56:57.144-04:00  INFO 176 --- [brain-bucket-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 47 ms. Found 4 JPA repository interfaces.
+2026-10-26T07:56:57.664-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-10-26T07:56:57.679-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-26T07:56:57.680-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-26T07:56:57.713-04:00  INFO 176 --- [brain-bucket-backend] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1179 ms
+2026-10-26T07:56:57.833-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-26T07:56:57.841-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn5: url=jdbc:h2:mem:compat_23ed056c-f035-4f87-9e25-526a8a00c997 user=SA
+2026-10-26T07:56:57.843-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-26T07:56:57.880-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_23ed056c-f035-4f87-9e25-526a8a00c997 (H2 2.4)
+2026-10-26T07:56:57.886-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:56:57.899-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.009s)
+2026-10-26T07:56:57.905-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": 2
+2026-10-26T07:56:57.908-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Schema "PUBLIC" is up to date. No migration necessary.
+2026-10-26T07:56:57.975-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-10-26T07:56:58.017-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-10-26T07:56:58.328-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-26T07:56:58.384-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:compat_23ed056c-f035-4f87-9e25-526a8a00c997]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: COMPAT_23ED056C-F035-4F87-9E25-526A8A00C997/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-10-26T07:56:59.204-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-26T07:56:59.250-04:00  INFO 176 --- [brain-bucket-backend] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-26T07:56:59.322-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-26T07:57:00.285-04:00  INFO 176 --- [brain-bucket-backend] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-10-26T07:57:00.535-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.s.b.w.a.WelcomePageHandlerMapping      : Adding welcome page: class path resource [static/index.html]
+2026-10-26T07:57:00.809-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 35073 (http) with context path '/'
+2026-10-26T07:57:00.816-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.a.maven.surefire.booter.ForkedBooter   : Started ForkedBooter in 4.643 seconds (process running for 6.009)
+2026-10-26T07:57:00.819-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_23ed056c-f035-4f87-9e25-526a8a00c997 (H2 2.4)
+2026-10-26T07:57:00.824-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:00.828-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.002s)
+2026-10-26T07:57:00.831-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_23ed056c-f035-4f87-9e25-526a8a00c997 (H2 2.4)
+2026-10-26T07:57:00.834-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:00.842-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-10-26T07:57:00.849-04:00  INFO 176 --- [brain-bucket-backend] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-10-26T07:57:00.854-04:00  INFO 176 --- [brain-bucket-backend] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-26T07:57:00.856-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-10-26T07:57:00.859-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-10-26T07:57:00.894-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_6f40f6cc-7b47-41c0-b129-6b5174fb4dda (H2 2.4)
+2026-10-26T07:57:00.900-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:00.903-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-10-26T07:57:00.930-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_6f40f6cc-7b47-41c0-b129-6b5174fb4dda (H2 2.4)
+2026-10-26T07:57:00.941-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:00.944-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" with baseline ...
+2026-10-26T07:57:00.948-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbBaseline     : Successfully baselined schema with version: 1
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-26T07:57:00.970-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.a.maven.surefire.booter.ForkedBooter   : Starting ForkedBooter v3.5.6 using Java 21.0.13 with PID 176 (started by root in /workspace/scratch/4e55d51f15c0/final-20261026/brain-bucket/backend)
+2026-10-26T07:57:00.971-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.a.maven.surefire.booter.ForkedBooter   : No active profile set, falling back to 1 default profile: "default"
+2026-10-26T07:57:01.089-04:00  INFO 176 --- [brain-bucket-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-26T07:57:01.101-04:00  INFO 176 --- [brain-bucket-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 10 ms. Found 4 JPA repository interfaces.
+2026-10-26T07:57:01.178-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-10-26T07:57:01.179-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-26T07:57:01.179-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-26T07:57:01.190-04:00  INFO 176 --- [brain-bucket-backend] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 217 ms
+2026-10-26T07:57:01.234-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-10-26T07:57:01.235-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection conn20: url=jdbc:h2:mem:compat_6f40f6cc-7b47-41c0-b129-6b5174fb4dda user=SA
+2026-10-26T07:57:01.236-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-10-26T07:57:01.245-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_6f40f6cc-7b47-41c0-b129-6b5174fb4dda (H2 2.4)
+2026-10-26T07:57:01.249-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.252-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.001s)
+2026-10-26T07:57:01.255-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": 2
+2026-10-26T07:57:01.256-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Schema "PUBLIC" is up to date. No migration necessary.
+2026-10-26T07:57:01.266-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-10-26T07:57:01.282-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-26T07:57:01.284-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:compat_6f40f6cc-7b47-41c0-b129-6b5174fb4dda]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: COMPAT_6F40F6CC-7B47-41C0-B129-6B5174FB4DDA/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-10-26T07:57:01.354-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-26T07:57:01.365-04:00  INFO 176 --- [brain-bucket-backend] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-26T07:57:01.438-04:00  INFO 176 --- [brain-bucket-backend] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-10-26T07:57:01.477-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.s.b.w.a.WelcomePageHandlerMapping      : Adding welcome page: class path resource [static/index.html]
+2026-10-26T07:57:01.541-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 42231 (http) with context path '/'
+2026-10-26T07:57:01.544-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.a.maven.surefire.booter.ForkedBooter   : Started ForkedBooter in 0.593 seconds (process running for 6.738)
+2026-10-26T07:57:01.546-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_6f40f6cc-7b47-41c0-b129-6b5174fb4dda (H2 2.4)
+2026-10-26T07:57:01.550-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.556-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.003s)
+2026-10-26T07:57:01.557-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_6f40f6cc-7b47-41c0-b129-6b5174fb4dda (H2 2.4)
+2026-10-26T07:57:01.560-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.565-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-10-26T07:57:01.569-04:00  INFO 176 --- [brain-bucket-backend] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-10-26T07:57:01.573-04:00  INFO 176 --- [brain-bucket-backend] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-26T07:57:01.574-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown initiated...
+2026-10-26T07:57:01.583-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown completed.
+2026-10-26T07:57:01.603-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_81e7cc0b-e0b5-441f-8e8b-bbd90a95c73e (H2 2.4)
+2026-10-26T07:57:01.608-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.610-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-10-26T07:57:01.617-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_81e7cc0b-e0b5-441f-8e8b-bbd90a95c73e (H2 2.4)
+2026-10-26T07:57:01.620-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.621-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" with baseline ...
+2026-10-26T07:57:01.625-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbBaseline     : Successfully baselined schema with version: 1
+2026-10-26T07:57:01.634-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_81e7cc0b-e0b5-441f-8e8b-bbd90a95c73e (H2 2.4)
+2026-10-26T07:57:01.638-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.653-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_b35a6133-f2c1-4fb0-b4b4-211a822f09ee (H2 2.4)
+2026-10-26T07:57:01.657-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.659-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-10-26T07:57:01.667-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_b35a6133-f2c1-4fb0-b4b4-211a822f09ee (H2 2.4)
+2026-10-26T07:57:01.671-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.672-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" with baseline ...
+2026-10-26T07:57:01.676-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbBaseline     : Successfully baselined schema with version: 1
+2026-10-26T07:57:01.686-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_b35a6133-f2c1-4fb0-b4b4-211a822f09ee (H2 2.4)
+2026-10-26T07:57:01.689-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.693-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 3 migrations (execution time 00:00.002s)
+2026-10-26T07:57:01.696-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_b35a6133-f2c1-4fb0-b4b4-211a822f09ee (H2 2.4)
+2026-10-26T07:57:01.700-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.703-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 3 migrations (execution time 00:00.001s)
+2026-10-26T07:57:01.704-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": 2
+2026-10-26T07:57:01.705-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Schema "PUBLIC" is up to date. No migration necessary.
+2026-10-26T07:57:01.713-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_9f00c47d-db30-4c91-9478-099ef9776c8d (H2 2.4)
+2026-10-26T07:57:01.716-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.718-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-10-26T07:57:01.725-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_9f00c47d-db30-4c91-9478-099ef9776c8d (H2 2.4)
+2026-10-26T07:57:01.728-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.730-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" with baseline ...
+2026-10-26T07:57:01.733-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbBaseline     : Successfully baselined schema with version: 1
+2026-10-26T07:57:01.740-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_9f00c47d-db30-4c91-9478-099ef9776c8d (H2 2.4)
+2026-10-26T07:57:01.744-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.747-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 3 migrations (execution time 00:00.001s)
+2026-10-26T07:57:01.750-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_9f00c47d-db30-4c91-9478-099ef9776c8d (H2 2.4)
+2026-10-26T07:57:01.753-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.756-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 3 migrations (execution time 00:00.001s)
+2026-10-26T07:57:01.757-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": 2
+2026-10-26T07:57:01.758-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Schema "PUBLIC" is up to date. No migration necessary.
+2026-10-26T07:57:01.765-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_9970ab1c-89d5-4831-b683-885a7712f43b (H2 2.4)
+2026-10-26T07:57:01.769-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.771-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-10-26T07:57:01.779-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_9970ab1c-89d5-4831-b683-885a7712f43b (H2 2.4)
+2026-10-26T07:57:01.782-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.784-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" with baseline ...
+2026-10-26T07:57:01.787-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbBaseline     : Successfully baselined schema with version: 1
+2026-10-26T07:57:01.795-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_9970ab1c-89d5-4831-b683-885a7712f43b (H2 2.4)
+2026-10-26T07:57:01.798-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.801-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 3 migrations (execution time 00:00.001s)
+2026-10-26T07:57:01.802-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_9970ab1c-89d5-4831-b683-885a7712f43b (H2 2.4)
+2026-10-26T07:57:01.805-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.808-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 3 migrations (execution time 00:00.002s)
+2026-10-26T07:57:01.810-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": 2
+2026-10-26T07:57:01.811-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Schema "PUBLIC" is up to date. No migration necessary.
+2026-10-26T07:57:01.818-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_e5ec0f68-9290-4898-826c-1e77f0a1a769 (H2 2.4)
+2026-10-26T07:57:01.821-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.823-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-10-26T07:57:01.830-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_e5ec0f68-9290-4898-826c-1e77f0a1a769 (H2 2.4)
+2026-10-26T07:57:01.833-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.835-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" with baseline ...
+2026-10-26T07:57:01.838-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbBaseline     : Successfully baselined schema with version: 1
+2026-10-26T07:57:01.846-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_e5ec0f68-9290-4898-826c-1e77f0a1a769 (H2 2.4)
+2026-10-26T07:57:01.848-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.851-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 3 migrations (execution time 00:00.001s)
+2026-10-26T07:57:01.853-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_e5ec0f68-9290-4898-826c-1e77f0a1a769 (H2 2.4)
+2026-10-26T07:57:01.856-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.858-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 3 migrations (execution time 00:00.001s)
+2026-10-26T07:57:01.860-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": 2
+2026-10-26T07:57:01.860-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Schema "PUBLIC" is up to date. No migration necessary.
+2026-10-26T07:57:01.868-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_09a65347-3b69-475a-bf09-70374f4f5cce (H2 2.4)
+2026-10-26T07:57:01.872-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.873-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-10-26T07:57:01.879-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_09a65347-3b69-475a-bf09-70374f4f5cce (H2 2.4)
+2026-10-26T07:57:01.882-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.883-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" with baseline ...
+2026-10-26T07:57:01.886-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbBaseline     : Successfully baselined schema with version: 1
+2026-10-26T07:57:01.898-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_09a65347-3b69-475a-bf09-70374f4f5cce (H2 2.4)
+2026-10-26T07:57:01.900-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.902-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.001s)
+2026-10-26T07:57:01.903-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_09a65347-3b69-475a-bf09-70374f4f5cce (H2 2.4)
+2026-10-26T07:57:01.906-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.908-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.001s)
+2026-10-26T07:57:01.909-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": 2
+2026-10-26T07:57:01.909-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Schema "PUBLIC" is up to date. No migration necessary.
+2026-10-26T07:57:01.916-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_2af49c4f-dc83-4a7c-9a9b-d0f9b7b6fe9c (H2 2.4)
+2026-10-26T07:57:01.919-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.921-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-10-26T07:57:01.927-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_2af49c4f-dc83-4a7c-9a9b-d0f9b7b6fe9c (H2 2.4)
+2026-10-26T07:57:01.929-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.930-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" with baseline ...
+2026-10-26T07:57:01.933-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbBaseline     : Successfully baselined schema with version: 1
+2026-10-26T07:57:01.940-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_2af49c4f-dc83-4a7c-9a9b-d0f9b7b6fe9c (H2 2.4)
+2026-10-26T07:57:01.943-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.946-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.001s)
+2026-10-26T07:57:01.947-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_2af49c4f-dc83-4a7c-9a9b-d0f9b7b6fe9c (H2 2.4)
+2026-10-26T07:57:01.949-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.951-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.001s)
+2026-10-26T07:57:01.953-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": 2
+2026-10-26T07:57:01.953-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Schema "PUBLIC" is up to date. No migration necessary.
+2026-10-26T07:57:01.960-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_6306dc6c-14e1-4843-9886-15b7e6e16c18 (H2 2.4)
+2026-10-26T07:57:01.963-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.964-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-10-26T07:57:01.971-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_6306dc6c-14e1-4843-9886-15b7e6e16c18 (H2 2.4)
+2026-10-26T07:57:01.973-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.974-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" with baseline ...
+2026-10-26T07:57:01.977-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbBaseline     : Successfully baselined schema with version: 1
+2026-10-26T07:57:01.983-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_6306dc6c-14e1-4843-9886-15b7e6e16c18 (H2 2.4)
+2026-10-26T07:57:01.985-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.988-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.001s)
+2026-10-26T07:57:01.989-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_6306dc6c-14e1-4843-9886-15b7e6e16c18 (H2 2.4)
+2026-10-26T07:57:01.991-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:01.994-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.001s)
+2026-10-26T07:57:01.995-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": 2
+2026-10-26T07:57:01.996-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Schema "PUBLIC" is up to date. No migration necessary.
+2026-10-26T07:57:02.002-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_78eac618-ba80-4066-9387-d5894d42e609 (H2 2.4)
+2026-10-26T07:57:02.005-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:02.006-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-10-26T07:57:02.012-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_78eac618-ba80-4066-9387-d5894d42e609 (H2 2.4)
+2026-10-26T07:57:02.014-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:02.015-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" with baseline ...
+2026-10-26T07:57:02.018-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbBaseline     : Successfully baselined schema with version: 1
+2026-10-26T07:57:02.024-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_78eac618-ba80-4066-9387-d5894d42e609 (H2 2.4)
+2026-10-26T07:57:02.026-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:02.028-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.001s)
+2026-10-26T07:57:02.029-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_78eac618-ba80-4066-9387-d5894d42e609 (H2 2.4)
+2026-10-26T07:57:02.030-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:02.032-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.001s)
+2026-10-26T07:57:02.033-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": 2
+2026-10-26T07:57:02.033-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.core.internal.command.DbMigrate      : Schema "PUBLIC" is up to date. No migration necessary.
+2026-10-26T07:57:02.042-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:compat_16e9a8fa-b4a1-48e1-9b15-767d15fce56e (H2 2.4)
+2026-10-26T07:57:02.044-04:00  WARN 176 --- [brain-bucket-backend] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T07:57:02.045-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.638 s -- in com.brainbucket.MigrationCompatibilityTests
+[INFO] Running com.brainbucket.post.HttpSecurityTests
+2026-10-26T07:57:02.073-04:00  INFO 176 --- [brain-bucket-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.brainbucket.post.HttpSecurityTests]: HttpSecurityTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-26T07:57:02.101-04:00  INFO 176 --- [brain-bucket-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.brainbucket.BrainBucketBackendApplication for test class com.brainbucket.post.HttpSecurityTests
+2026-10-26T07:57:02.105-04:00  INFO 176 --- [brain-bucket-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.brainbucket.post.HttpSecurityTests]: HttpSecurityTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-26T07:57:02.106-04:00  INFO 176 --- [brain-bucket-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.brainbucket.BrainBucketBackendApplication for test class com.brainbucket.post.HttpSecurityTests
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-26T07:57:02.151-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.brainbucket.post.HttpSecurityTests   : Starting HttpSecurityTests using Java 21.0.13 with PID 176 (started by root in /workspace/scratch/4e55d51f15c0/final-20261026/brain-bucket/backend)
+2026-10-26T07:57:02.152-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.brainbucket.post.HttpSecurityTests   : The following 1 profile is active: "test"
+2026-10-26T07:57:02.251-04:00  INFO 176 --- [brain-bucket-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-26T07:57:02.260-04:00  INFO 176 --- [brain-bucket-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 7 ms. Found 4 JPA repository interfaces.
+2026-10-26T07:57:02.317-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-10-26T07:57:02.318-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-26T07:57:02.318-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-26T07:57:02.327-04:00  INFO 176 --- [brain-bucket-backend] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 174 ms
+2026-10-26T07:57:02.353-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-10-26T07:57:02.369-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-26T07:57:02.370-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Starting...
+2026-10-26T07:57:02.373-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-3 - Added connection conn130: url=jdbc:h2:mem:integration user=SA
+2026-10-26T07:57:02.374-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Start completed.
+2026-10-26T07:57:02.375-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:integration]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: INTEGRATION/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-10-26T07:57:02.443-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-26T07:57:02.456-04:00  INFO 176 --- [brain-bucket-backend] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-26T07:57:02.538-04:00  INFO 176 --- [brain-bucket-backend] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-10-26T07:57:02.579-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.s.b.w.a.WelcomePageHandlerMapping      : Adding welcome page: class path resource [static/index.html]
+2026-10-26T07:57:02.632-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 41955 (http) with context path '/'
+2026-10-26T07:57:02.634-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.brainbucket.post.HttpSecurityTests   : Started HttpSecurityTests in 0.51 seconds (process running for 7.828)
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+2026-10-26T07:57:14.272-04:00  INFO 176 --- [brain-bucket-backend] [o-auto-3-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-26T07:57:14.273-04:00  INFO 176 --- [brain-bucket-backend] [o-auto-3-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-26T07:57:14.274-04:00  INFO 176 --- [brain-bucket-backend] [o-auto-3-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 14.60 s -- in com.brainbucket.post.HttpSecurityTests
+[INFO] Running com.brainbucket.post.IntegrationWorkflowTests
+2026-10-26T07:57:16.665-04:00  INFO 176 --- [brain-bucket-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.brainbucket.post.IntegrationWorkflowTests]: IntegrationWorkflowTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-26T07:57:16.666-04:00  INFO 176 --- [brain-bucket-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.brainbucket.BrainBucketBackendApplication for test class com.brainbucket.post.IntegrationWorkflowTests
+2026-10-26T07:57:16.667-04:00  INFO 176 --- [brain-bucket-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.brainbucket.post.IntegrationWorkflowTests]: IntegrationWorkflowTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-26T07:57:16.672-04:00  INFO 176 --- [brain-bucket-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.brainbucket.BrainBucketBackendApplication for test class com.brainbucket.post.IntegrationWorkflowTests
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-26T07:57:16.697-04:00  INFO 176 --- [brain-bucket-backend] [           main] c.b.post.IntegrationWorkflowTests        : Starting IntegrationWorkflowTests using Java 21.0.13 with PID 176 (started by root in /workspace/scratch/4e55d51f15c0/final-20261026/brain-bucket/backend)
+2026-10-26T07:57:16.697-04:00  INFO 176 --- [brain-bucket-backend] [           main] c.b.post.IntegrationWorkflowTests        : The following 1 profile is active: "test"
+2026-10-26T07:57:16.779-04:00  INFO 176 --- [brain-bucket-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-26T07:57:16.785-04:00  INFO 176 --- [brain-bucket-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 5 ms. Found 4 JPA repository interfaces.
+2026-10-26T07:57:16.835-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-10-26T07:57:16.849-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-26T07:57:16.849-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Starting...
+2026-10-26T07:57:16.851-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-4 - Added connection conn140: url=jdbc:h2:mem:integration user=SA
+2026-10-26T07:57:16.851-04:00  INFO 176 --- [brain-bucket-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Start completed.
+2026-10-26T07:57:16.852-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:integration]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: INTEGRATION/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-10-26T07:57:16.910-04:00  INFO 176 --- [brain-bucket-backend] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-26T07:57:16.919-04:00  INFO 176 --- [brain-bucket-backend] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-26T07:57:16.977-04:00  INFO 176 --- [brain-bucket-backend] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-10-26T07:57:17.012-04:00  INFO 176 --- [brain-bucket-backend] [           main] o.s.b.w.a.WelcomePageHandlerMapping      : Adding welcome page: class path resource [static/index.html]
+2026-10-26T07:57:17.061-04:00  INFO 176 --- [brain-bucket-backend] [           main] c.b.post.IntegrationWorkflowTests        : Started IntegrationWorkflowTests in 0.38 seconds (process running for 22.254)
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.226 s -- in com.brainbucket.post.IntegrationWorkflowTests
+[INFO] Running com.brainbucket.BrainBucketBackendApplicationTests
+2026-10-26T07:57:17.890-04:00  INFO 176 --- [brain-bucket-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.brainbucket.BrainBucketBackendApplicationTests]: BrainBucketBackendApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-26T07:57:17.898-04:00  INFO 176 --- [brain-bucket-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.brainbucket.BrainBucketBackendApplication for test class com.brainbucket.BrainBucketBackendApplicationTests
+2026-10-26T07:57:17.903-04:00  INFO 176 --- [brain-bucket-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.brainbucket.BrainBucketBackendApplicationTests]: BrainBucketBackendApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-26T07:57:17.904-04:00  INFO 176 --- [brain-bucket-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.brainbucket.BrainBucketBackendApplication for test class com.brainbucket.BrainBucketBackendApplicationTests
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.021 s -- in com.brainbucket.BrainBucketBackendApplicationTests
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 2
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ brain-bucket-backend ---
+[INFO] Building jar: /workspace/scratch/4e55d51f15c0/final-20261026/brain-bucket/backend/target/brain-bucket-backend-0.0.1-SNAPSHOT.jar
+[INFO] 
+[INFO] --- spring-boot:4.1.1:repackage (repackage) @ brain-bucket-backend ---
+[INFO] Replacing main artifact /workspace/scratch/4e55d51f15c0/final-20261026/brain-bucket/backend/target/brain-bucket-backend-0.0.1-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /workspace/scratch/4e55d51f15c0/final-20261026/brain-bucket/backend/target/brain-bucket-backend-0.0.1-SNAPSHOT.jar.original
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  27.365 s
+[INFO] Finished at: 2026-10-26T07:57:18-04:00
+[INFO] ------------------------------------------------------------------------

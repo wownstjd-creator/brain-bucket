@@ -27,6 +27,8 @@ class HttpSecurityTests {
   @Autowired AttachmentService files;
   @Autowired PostApprovalService approval;
   @Autowired AdminPostService reviews;
+  @Autowired PostRepository posts;
+  @Autowired PostLifecycleService lifecycle;
 
   HttpClient client() {
     return HttpClient.newBuilder()
@@ -128,7 +130,7 @@ class HttpSecurityTests {
     files.save("http-owner@example.com", id, "POSTER", file, null);
     files.save("http-owner@example.com", id, "EVIDENCE", file, null);
     approval.requestApproval("http-owner@example.com", id);
-    reviews.approve("http-admin@example.com", id);
+    reviews.approve("http-admin@example.com", id, posts.findById(id).orElseThrow().getVersion());
     assertEquals(
         401,
         call(anonymous, "/api/posts/mine/" + id + "/attachments/evidence", "GET", null, null)
@@ -166,4 +168,45 @@ class HttpSecurityTests {
     assertTrue(encoder.matches("ChangedPass456!",users.findByEmail(email).orElseThrow().getPasswordHash()));
   }
 
+
+  @Test
+  void staleReviewCannotApproveOrRejectResubmittedContent() throws Exception {
+    String email="revision-owner@example.com", adminEmail="revision-admin@example.com";
+    users.saveAndFlush(new User(email,encoder.encode("TestPass123!"),"Owner"));
+    var admin=users.saveAndFlush(new User(adminEmail,encoder.encode("TestPass123!"),"Admin"));
+    db.update("UPDATE users SET role='ADMIN' WHERE id=?",admin.getId());
+    var reviewer=client(); login(reviewer,adminEmail);
+    var owner=client(); login(owner,email);
+    var today=LocalDate.now(ZoneId.of("Asia/Seoul"));
+    var draft=new CreatePostRequest("Before","Team","EVENT","before",null,null,null,null,today.plusDays(30),today,null,true);
+    Long id=drafts.createDraft(email,draft).id();
+    var image=new java.awt.image.BufferedImage(2,2,java.awt.image.BufferedImage.TYPE_INT_RGB);
+    var out=new java.io.ByteArrayOutputStream();javax.imageio.ImageIO.write(image,"png",out);
+    var file=new MockMultipartFile("file","test.png","image/png",out.toByteArray());
+    files.save(email,id,"POSTER",file,null);files.save(email,id,"EVIDENCE",file,null);
+    long draftVersion=posts.findById(id).orElseThrow().getVersion();
+    String submit="/api/posts/mine/"+id+"/approval-request?version=";
+    assertEquals(409,call(owner,submit+(draftVersion-1),"POST",null,csrf(owner)).statusCode());
+    assertEquals(200,call(owner,submit+draftVersion,"POST",null,csrf(owner)).statusCode());
+    long reviewed=posts.findById(id).orElseThrow().getVersion();
+    lifecycle.change(email,id,reviewed,false);
+    long editable=posts.findById(id).orElseThrow().getVersion();
+    drafts.updateMyDraft(email,id,new CreatePostRequest("Changed","Team","EVENT","new content",null,null,null,null,today.plusDays(30),today,editable,true));
+    approval.requestApproval(email,id,posts.findById(id).orElseThrow().getVersion());
+    long current=posts.findById(id).orElseThrow().getVersion();
+    assertTrue(current>reviewed);
+    String path="/api/admin/posts/"+id;
+    assertEquals(400,call(reviewer,path+"/approve","POST","{}",csrf(reviewer)).statusCode());
+    assertEquals(400,call(reviewer,path+"/approve","POST",null,csrf(reviewer)).statusCode());
+    assertEquals(400,call(reviewer,path+"/reject","POST","{\"reason\":\"fix\"}",csrf(reviewer)).statusCode());
+    assertEquals(409,call(reviewer,path+"/approve","POST","{\"version\":"+reviewed+"}",csrf(reviewer)).statusCode());
+    assertEquals(409,call(reviewer,path+"/reject","POST","{\"reason\":\"fix\",\"version\":"+reviewed+"}",csrf(reviewer)).statusCode());
+    assertEquals(PostStatus.PENDING,posts.findById(id).orElseThrow().getStatus());
+    assertEquals(200,call(reviewer,path+"/reject","POST","{\"reason\":\"reviewed changes\",\"version\":"+current+"}",csrf(reviewer)).statusCode());
+    approval.requestApproval(email,id,posts.findById(id).orElseThrow().getVersion());
+    long latest=posts.findById(id).orElseThrow().getVersion();
+    assertEquals(200,call(reviewer,path+"/approve","POST","{\"version\":"+latest+"}",csrf(reviewer)).statusCode());
+    assertEquals(PostStatus.APPROVED,posts.findById(id).orElseThrow().getStatus());
+    assertEquals(404,call(reviewer,"/api/dev/users/count","GET",null,null).statusCode());
+  }
 }
